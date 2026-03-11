@@ -65,7 +65,7 @@
             <button onclick="switchTab('bank')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition hover:bg-blue-700" data-target="bank">
                 <i class="fas fa-database w-5"></i><span>Bank Soal</span>
             </button>
-            <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition hover:bg-blue-700" data-target="settings">
+            <button onclick="openSettingsWithPassword()" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition hover:bg-blue-700" data-target="settings">
                 <i class="fas fa-cog w-5"></i><span>Pengaturan</span>
             </button>
         </nav>
@@ -409,12 +409,7 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Google Gemini API Key</label>
                             <p class="text-xs text-gray-500 mb-2">Dapatkan API key secara gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 hover:underline">Google AI Studio</a>.</p>
-                            <div class="flex">
-                                <input type="password" id="setting-gemini-key" class="flex-1 border border-gray-300 rounded-l-lg p-3 focus:ring-primary focus:border-primary" placeholder="AIzaSy...">
-                                <button onclick="togglePassword('setting-gemini-key')" class="bg-gray-100 border border-l-0 border-gray-300 px-4 rounded-r-lg text-gray-600 hover:bg-gray-200 transition">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
+                            <input type="password" id="setting-gemini-key" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-primary focus:border-primary" placeholder="AIzaSy...">
                         </div>
 
                         <div>
@@ -514,6 +509,29 @@
         </div>
     </div>
 
+    <!-- Modal Password Pengaturan -->
+    <div id="modal-password" class="fixed inset-0 bg-black bg-opacity-50 z-[120] hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-lock text-primary mr-2"></i>Akses Terkunci</h3>
+                <button onclick="closePasswordModal()" class="text-gray-400 hover:text-red-500 transition focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 text-center">
+                <div class="mb-4 text-gray-500">
+                    <i class="fas fa-shield-alt text-4xl mb-2"></i>
+                    <p class="text-sm">Masukkan kata sandi untuk membuka halaman Pengaturan Sistem.</p>
+                </div>
+                <input type="password" id="input-password-settings" class="w-full border border-gray-300 rounded-lg p-3 text-center tracking-widest focus:ring-primary focus:border-primary mb-5" placeholder="Kata Sandi..." onkeyup="if(event.key === 'Enter') verifyPassword()">
+                <div class="flex justify-center space-x-3">
+                    <button onclick="closePasswordModal()" class="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition text-sm font-medium w-full">Batal</button>
+                    <button onclick="verifyPassword()" class="px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium w-full">Buka Akses</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-[110] flex items-center">
         <i id="toast-icon" class="fas fa-check-circle text-green-400 mr-3"></i>
@@ -525,7 +543,7 @@
         // --- GLOBAL VARIABLES ---
         let currentSoalData = [];
         let appSettings = {
-            geminiKey: localStorage.getItem('sd_gemini_key') || '',
+            geminiKey: localStorage.getItem('sd_gemini_key') || 'AIzaSyCFc8AI9OROgNEaceUv5wvXPjVX_vJsMr0',
             gasUrl: localStorage.getItem('sd_gas_url') || 'https://script.google.com/macros/s/AKfycbzV5ANNawAX1B51bnQ9BI8doJEjmqQvGnldRcfLNJqiJlfTwDe2wdV4RL3_KC2Nmd_FHA/exec'
         };
         let bankSoalData = [];
@@ -1215,6 +1233,31 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
+            }
+        }
+
+        // --- PASSWORD PENGATURAN LOGIC ---
+        function openSettingsWithPassword() {
+            document.getElementById('modal-password').classList.remove('hidden');
+            const input = document.getElementById('input-password-settings');
+            input.value = '';
+            setTimeout(() => input.focus(), 100); // Auto focus ke kolom input
+        }
+
+        function closePasswordModal() {
+            document.getElementById('modal-password').classList.add('hidden');
+        }
+
+        function verifyPassword() {
+            const pass = document.getElementById('input-password-settings').value;
+            if (pass === '291188Y@di') {
+                closePasswordModal();
+                switchTab('settings'); // Jika benar, buka tab pengaturan
+            } else {
+                showToast('Kata sandi salah!', 'error');
+                const input = document.getElementById('input-password-settings');
+                input.value = ''; // Kosongkan
+                input.focus(); // Fokus lagi untuk mencoba ulang
             }
         }
     </script>

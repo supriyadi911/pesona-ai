@@ -31,9 +31,15 @@
             .print\:hidden { display: none !important; }
         }
         .tab-active { border-bottom: 2px solid #10B981; color: #10B981; font-weight: bold; }
+        
+        /* Custom Scrollbar for Modal */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans h-screen flex overflow-hidden">
+<body class="bg-gray-50 text-gray-800 font-sans h-screen flex overflow-hidden relative">
 
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 bg-primary text-white flex flex-col transition-all duration-300 z-20">
@@ -69,7 +75,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 flex flex-col h-full overflow-hidden relative">
+    <main id="main-content" class="flex-1 flex flex-col h-full overflow-hidden relative z-10">
         
         <!-- Header -->
         <header id="header" class="bg-white shadow-sm h-16 flex items-center justify-between px-6 z-10">
@@ -321,21 +327,35 @@
             <!-- Bank Soal Section -->
             <section id="bank" class="page-section hidden h-full flex flex-col">
                 <div class="bg-white rounded-xl shadow-sm p-4 mb-4 flex flex-wrap gap-4 justify-between items-center no-print">
-                    <div class="flex space-x-4 flex-wrap gap-y-2">
-                        <select id="filter-mapel" class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-primary focus:border-primary" onchange="filterBankSoal()">
-                            <option value="">Semua Mapel</option>
+                    <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                        <!-- Dropdown Filter Mata Pelajaran (Disamakan dengan Generator) -->
+                        <select id="filter-mapel" onchange="filterBankSoal()" class="w-full md:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
+                            <option value="">Semua Mata Pelajaran</option>
                             <option value="Matematika">Matematika</option>
                             <option value="Bahasa Indonesia">Bahasa Indonesia</option>
                             <option value="IPAS">IPAS</option>
+                            <option value="Pancasila">Pancasila</option>
+                            <option value="Pendidikan Agama">Pendidikan Agama</option>
+                            <option value="Seni Budaya">Seni Budaya</option>
+                            <option value="PJOK">PJOK</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
                         </select>
-                        <select id="filter-kelas" class="border border-gray-300 rounded-lg p-2 text-sm focus:ring-primary focus:border-primary" onchange="filterBankSoal()">
+
+                        <!-- Dropdown Filter Kelas (Disamakan dengan Generator) -->
+                        <select id="filter-kelas" onchange="filterBankSoal()" class="w-full md:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
                             <option value="">Semua Kelas</option>
                             <option value="Kelas 1">Kelas 1</option>
+                            <option value="Kelas 2">Kelas 2</option>
+                            <option value="Kelas 3">Kelas 3</option>
+                            <option value="Kelas 4">Kelas 4</option>
+                            <option value="Kelas 5">Kelas 5</option>
                             <option value="Kelas 6">Kelas 6</option>
                         </select>
-                        <div class="relative">
-                            <input type="text" id="search-soal" placeholder="Cari materi/soal..." class="border border-gray-300 rounded-lg p-2 pl-8 text-sm w-48 focus:ring-primary focus:border-primary" onkeyup="filterBankSoal()">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+
+                        <!-- Input Pencarian -->
+                        <div class="relative w-full md:w-64">
+                            <input type="text" id="filter-search" onkeyup="filterBankSoal()" placeholder="Cari soal/materi..." class="w-full p-2 pl-9 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
                         </div>
                     </div>
                     <div>
@@ -346,23 +366,37 @@
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm flex-1 overflow-hidden flex flex-col">
-                    <div class="overflow-y-auto flex-1 p-0">
+                    <div class="overflow-y-auto flex-1 p-0 custom-scrollbar">
                         <table class="w-full text-left border-collapse">
-                            <thead class="bg-gray-100 sticky top-0 z-10 text-gray-600 text-sm">
+                            <thead class="bg-gray-100 sticky top-0 z-10 text-gray-600 text-sm shadow-sm">
                                 <tr>
+                                    <th class="p-4 border-b w-10 text-center">
+                                        <input type="checkbox" id="chk-all" onchange="toggleSelectAll(this)" class="w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary cursor-pointer" title="Pilih Semua">
+                                    </th>
                                     <th class="p-4 border-b">Tgl/Waktu</th>
                                     <th class="p-4 border-b">Mapel & Kelas</th>
                                     <th class="p-4 border-b">Materi</th>
                                     <th class="p-4 border-b">Jenis Soal</th>
-                                    <th class="p-4 border-b">Soal</th>
+                                    <th class="p-4 border-b w-1/3">Soal</th>
                                     <th class="p-4 border-b text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="table-bank-body" class="text-sm">
-                                <tr><td colspan="6" class="p-8 text-center text-gray-500">Mengambil data dari Spreadsheet...</td></tr>
+                                <tr><td colspan="7" class="p-8 text-center text-gray-500">Mengambil data dari Spreadsheet...</td></tr>
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Footer Bank Soal (Buat Soal) -->
+                <div class="bg-white rounded-xl shadow-sm p-4 mt-4 flex justify-between items-center no-print border border-gray-200">
+                    <div>
+                        <span class="text-sm text-gray-500 font-semibold">Total Terpilih:</span>
+                        <span id="count-selected" class="font-bold text-xl text-primary ml-2">0</span> <span class="text-sm text-gray-600">Soal</span>
+                    </div>
+                    <button onclick="buatSoalDariBank()" class="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold hover:bg-green-600 transition shadow flex items-center group">
+                        <i class="fas fa-file-export mr-2 group-hover:-translate-y-1 transition-transform"></i> Buat Lembar Soal
+                    </button>
                 </div>
             </section>
 
@@ -401,8 +435,87 @@
         </div>
     </main>
 
+    <!-- Modal Edit Soal -->
+    <div id="modal-edit" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-edit text-primary mr-2"></i>Edit Soal Manual</h3>
+                <button onclick="tutupModalEdit()" class="text-gray-400 hover:text-red-500 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-1 custom-scrollbar space-y-4">
+                <input type="hidden" id="edit-id">
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Mata Pelajaran</label>
+                        <input type="text" id="edit-mapel" class="w-full border rounded p-2 text-sm focus:ring-primary focus:border-primary">
+                    </div>
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Kelas</label>
+                        <input type="text" id="edit-kelas" class="w-full border rounded p-2 text-sm focus:ring-primary focus:border-primary">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Materi</label>
+                        <input type="text" id="edit-materi" class="w-full border rounded p-2 text-sm focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Pertanyaan / Soal</label>
+                    <textarea id="edit-soal" rows="3" class="w-full border rounded p-2 text-sm focus:ring-primary focus:border-primary resize-y"></textarea>
+                </div>
+
+                <!-- Pilihan Ganda -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-blue-50 p-4 rounded border border-blue-100">
+                    <p class="col-span-full text-xs text-blue-800 font-semibold mb-1"><i class="fas fa-list-ul mr-1"></i>Pilihan Ganda (Kosongkan jika bukan PG)</p>
+                    <div class="flex items-center">
+                        <span class="font-bold mr-2 w-5">A.</span>
+                        <input type="text" id="edit-pila" class="flex-1 border rounded p-1.5 text-sm focus:ring-primary focus:border-primary">
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-bold mr-2 w-5">B.</span>
+                        <input type="text" id="edit-pilb" class="flex-1 border rounded p-1.5 text-sm focus:ring-primary focus:border-primary">
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-bold mr-2 w-5">C.</span>
+                        <input type="text" id="edit-pilc" class="flex-1 border rounded p-1.5 text-sm focus:ring-primary focus:border-primary">
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-bold mr-2 w-5">D.</span>
+                        <input type="text" id="edit-pild" class="flex-1 border rounded p-1.5 text-sm focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="col-span-1">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Kunci Jawaban</label>
+                        <input type="text" id="edit-jawaban" class="w-full border rounded p-2 text-sm focus:ring-primary focus:border-primary font-semibold text-green-700">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Pembahasan</label>
+                        <textarea id="edit-pembahasan" rows="2" class="w-full border rounded p-2 text-sm focus:ring-primary focus:border-primary"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t bg-gray-50 flex justify-end space-x-3">
+                <button onclick="tutupModalEdit()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition text-sm font-medium">Batal</button>
+                <button onclick="simpanEditSoal()" id="btn-save-edit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm font-medium">
+                    <i class="fas fa-save mr-2"></i> Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center">
+    <div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-[110] flex items-center">
         <i id="toast-icon" class="fas fa-check-circle text-green-400 mr-3"></i>
         <span id="toast-message">Berhasil disimpan!</span>
     </div>
@@ -416,6 +529,7 @@
             gasUrl: localStorage.getItem('sd_gas_url') || ''
         };
         let bankSoalData = [];
+        let selectedBankSoalIds = new Set(); // Menyimpan ID soal yang dicentang
 
         // --- INITIALIZATION ---
         window.onload = () => {
@@ -542,7 +656,6 @@
                 return;
             }
 
-            // Ambil Input Dasar
             const mapel = document.getElementById('gen-mapel').value;
             const kelas = document.getElementById('gen-kelas').value;
             const materi = document.getElementById('gen-materi').value;
@@ -553,7 +666,6 @@
                 return;
             }
 
-            // Validasi Jenis Soal (Bisa Multiple)
             const checkboxJenis = document.querySelectorAll('.chk-jenis-soal:checked');
             const jenisTerpilih = Array.from(checkboxJenis).map(cb => cb.value);
 
@@ -562,7 +674,6 @@
                 return;
             }
 
-            // Validasi Tingkat Kesulitan & Jumlah Soal
             const isMudah = document.getElementById('chk-mudah').checked;
             const isSedang = document.getElementById('chk-sedang').checked;
             const isSulit = document.getElementById('chk-sulit').checked;
@@ -578,25 +689,21 @@
                 return;
             }
 
-            // Rincian untuk Prompt
             let rincianList = [];
             if (jmlMudah > 0) rincianList.push(`- ${jmlMudah} soal tingkat MUDAH`);
             if (jmlSedang > 0) rincianList.push(`- ${jmlSedang} soal tingkat SEDANG`);
             if (jmlSulit > 0) rincianList.push(`- ${jmlSulit} soal tingkat SULIT`);
 
-            // Setup UI
             document.getElementById('loading-overlay').classList.remove('hidden');
             document.getElementById('loading-text-detail').innerText = `Menyiapkan ${totalSoal} soal...`;
             document.getElementById('placeholder-result').classList.add('hidden');
             
-            // Set Kop Surat
             const judulKop = jenisTerpilih.length > 1 ? "LATIHAN SOAL CAMPURAN" : `LATIHAN SOAL ${jenisTerpilih[0].toUpperCase()}`;
             document.getElementById('kop-judul').innerText = judulKop;
             document.getElementById('kop-mapel').innerText = mapel;
             document.getElementById('kop-kelas').innerText = kelas;
             document.getElementById('kop-materi').innerText = materi;
             
-            // Buat Prompt untuk Gemini
             const promptText = `
 Anda adalah guru Sekolah Dasar yang ahli membuat soal ujian.
 Buatkan total ${totalSoal} soal untuk ${kelas} mata pelajaran ${mapel}.
@@ -642,7 +749,6 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                 const data = await response.json();
                 let rawText = data.candidates[0].content.parts[0].text;
                 
-                // Bersihkan Markdown dari respon
                 rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
                 
                 currentSoalData = JSON.parse(rawText);
@@ -651,7 +757,6 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                 document.getElementById('kop-surat').classList.remove('hidden');
                 switchResultTab('tab-soal');
                 
-                // Update counter
                 const totalEl = document.getElementById('stat-total');
                 totalEl.innerText = parseInt(totalEl.innerText) + totalSoal;
 
@@ -677,7 +782,6 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             containerKunci.innerHTML = '';
             containerBahas.innerHTML = '';
 
-            // Group Soal Berdasarkan Jenis Soal (agar terlihat rapi jika ada banyak jenis)
             let groupedSoal = {};
             currentSoalData.forEach(item => {
                 const jenis = item.jenis_soal || 'Umum';
@@ -687,21 +791,18 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
 
             let globalCounter = 1;
 
-            // Loop per kategori jenis soal
             for(const [jenis, items] of Object.entries(groupedSoal)) {
                 
-                // Tampilkan Header Jenis Soal jika ada lebih dari 1 jenis yang di-generate
                 if(Object.keys(groupedSoal).length > 1) {
                     containerSoal.innerHTML += `<div class="mt-8 mb-4 border-b-2 border-gray-300 pb-2"><h3 class="text-xl font-bold text-gray-800 uppercase">${jenis}</h3></div>`;
                 }
 
                 items.forEach((item) => {
-                    item.nomor = globalCounter++; // Re-assign nomor urut global
+                    item.nomor = globalCounter++; 
                     const isPG = jenis.toLowerCase().includes('pilihan') || jenis.toLowerCase().includes('ganda');
                     const isBS = jenis.toLowerCase().includes('benar') && jenis.toLowerCase().includes('salah');
                     const isUraian = jenis.toLowerCase().includes('uraian');
 
-                    // Badge Tingkat Kesulitan
                     let badgeColor = 'bg-gray-200 text-gray-700';
                     if(item.kesulitan) {
                         let diff = item.kesulitan.toLowerCase();
@@ -839,13 +940,14 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             if (!appSettings.gasUrl) return;
 
             const tbody = document.getElementById('table-bank-body');
-            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-primary"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-primary"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>';
 
             try {
                 const response = await fetch(`${appSettings.gasUrl}?action=getSoal`);
                 const data = await response.json();
                 
                 if(data.status === 'success') {
+                    // Simpan mapping index data dari GAS (Asumsi struktur: ID, Tgl, Mapel, Kelas, Materi, Jenis, Nomor, Soal, A, B, C, D, Kunci, Bahas)
                     bankSoalData = data.data; 
                     renderTableBank(bankSoalData);
                     document.getElementById('stat-bank').innerText = bankSoalData.length;
@@ -860,7 +962,7 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             tbody.innerHTML = '';
             
             if(dataList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada data di Bank Soal</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-500">Belum ada data di Bank Soal</td></tr>';
                 return;
             }
 
@@ -868,10 +970,16 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-gray-50 transition";
                 
-                const soalText = row[7].length > 50 ? row[7].substring(0, 50) + '...' : row[7];
+                const soalText = row[7].length > 60 ? row[7].substring(0, 60) + '...' : row[7];
                 let badgeJenis = `<span class="px-2 py-1 bg-gray-100 border border-gray-200 rounded text-xs text-gray-700">${row[5]}</span>`;
+                
+                // Cek apakah baris ini sedang terpilih
+                const isChecked = selectedBankSoalIds.has(String(row[0])) ? 'checked' : '';
 
                 tr.innerHTML = `
+                    <td class="p-4 text-center">
+                        <input type="checkbox" class="chk-soal w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer" value="${row[0]}" onchange="toggleSelectSoal(this)" ${isChecked}>
+                    </td>
                     <td class="p-4 text-xs text-gray-500 whitespace-nowrap">${row[1]}</td>
                     <td class="p-4">
                         <div class="font-semibold text-gray-800">${row[2]}</div>
@@ -880,18 +988,20 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                     <td class="p-4">${row[4]}</td>
                     <td class="p-4">${badgeJenis}</td>
                     <td class="p-4">${soalText}</td>
-                    <td class="p-4 text-center">
-                        <button onclick="hapusSoal('${row[0]}')" class="text-red-500 hover:text-red-700 mx-1 transition" title="Hapus"><i class="fas fa-trash"></i></button>
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <button onclick="bukaModalEdit('${row[0]}')" class="text-blue-500 hover:text-blue-700 mx-1 transition p-1 bg-blue-50 rounded" title="Edit Soal"><i class="fas fa-edit"></i></button>
+                        <button onclick="hapusSoal('${row[0]}')" class="text-red-500 hover:text-red-700 mx-1 transition p-1 bg-red-50 rounded" title="Hapus"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+            updateSelectedCount(); // Perbarui perhitungan total terpilih tiap render
         }
 
         function filterBankSoal() {
             const mapel = document.getElementById('filter-mapel').value.toLowerCase();
             const kelas = document.getElementById('filter-kelas').value.toLowerCase();
-            const search = document.getElementById('search-soal').value.toLowerCase();
+            const search = document.getElementById('filter-search').value.toLowerCase();
 
             const filtered = bankSoalData.filter(row => {
                 const rowMapel = String(row[2]).toLowerCase();
@@ -921,6 +1031,190 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                 }
             } catch(e) {
                 showToast("Gagal menghapus.", "error");
+            }
+        }
+
+        // --- LOGIC BUAT SOAL DARI BANK ---
+        function toggleSelectSoal(checkbox) {
+            if(checkbox.checked) {
+                selectedBankSoalIds.add(checkbox.value);
+            } else {
+                selectedBankSoalIds.delete(checkbox.value);
+            }
+            updateSelectedCount();
+        }
+
+        function toggleSelectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('.chk-soal');
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+                if(checkbox.checked) {
+                    selectedBankSoalIds.add(cb.value);
+                } else {
+                    selectedBankSoalIds.delete(cb.value);
+                }
+            });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            document.getElementById('count-selected').innerText = selectedBankSoalIds.size;
+            
+            // Sinkronkan status centang "Pilih Semua"
+            const allVisible = document.querySelectorAll('.chk-soal').length;
+            const allChecked = document.querySelectorAll('.chk-soal:checked').length;
+            const chkAll = document.getElementById('chk-all');
+            if(chkAll) {
+                chkAll.checked = (allVisible > 0 && allVisible === allChecked);
+            }
+        }
+
+        function buatSoalDariBank() {
+            if(selectedBankSoalIds.size === 0) {
+                alert("Silakan centang minimal satu soal dari tabel Bank Soal!");
+                return;
+            }
+
+            // Ambil data dari database yang ID-nya tercentang
+            const selectedSoal = bankSoalData.filter(row => selectedBankSoalIds.has(String(row[0])));
+            
+            // Format ulang mengikuti format AI (currentSoalData)
+            currentSoalData = selectedSoal.map((row, index) => {
+                let jenisRaw = row[5] || 'Umum';
+                let jenis = jenisRaw;
+                let kesulitan = '';
+                
+                // Pisahkan "Jenis Soal (Kesulitan)"
+                const match = jenisRaw.match(/(.*?)\s*\((.*?)\)/);
+                if(match) {
+                    jenis = match[1].trim();
+                    kesulitan = match[2].trim();
+                }
+
+                let pilihanObj = null;
+                if(row[8] || row[9] || row[10] || row[11]) {
+                    pilihanObj = {};
+                    if(row[8]) pilihanObj.A = row[8];
+                    if(row[9]) pilihanObj.B = row[9];
+                    if(row[10]) pilihanObj.C = row[10];
+                    if(row[11]) pilihanObj.D = row[11];
+                }
+
+                return {
+                    nomor: index + 1,
+                    kesulitan: kesulitan,
+                    jenis_soal: jenis,
+                    soal: row[7],
+                    pilihan: pilihanObj,
+                    jawaban: row[12],
+                    pembahasan: row[13]
+                };
+            });
+
+            // Atur Kop Surat Otomatis
+            const mapels = [...new Set(selectedSoal.map(r => r[2]))];
+            const kelass = [...new Set(selectedSoal.map(r => r[3]))];
+            const materis = [...new Set(selectedSoal.map(r => r[4]))];
+
+            document.getElementById('kop-judul').innerText = "LATIHAN SOAL (DARI BANK SOAL)";
+            document.getElementById('kop-mapel').innerText = mapels.length > 1 ? "Campuran" : (mapels[0] || "-");
+            document.getElementById('kop-kelas').innerText = kelass.length > 1 ? "Campuran" : (kelass[0] || "-");
+            document.getElementById('kop-materi').innerText = materis.length > 1 ? "Campuran" : (materis[0] || "-");
+
+            // Tampilkan ke Output Area
+            renderSoal();
+            document.getElementById('placeholder-result').classList.add('hidden');
+            document.getElementById('kop-surat').classList.remove('hidden');
+            
+            // Pindahkan tab ke Generator/Output dan tampilkan Lembar Soal
+            switchTab('generator');
+            switchResultTab('tab-soal');
+            
+            // Scroll otomatis ke area hasil
+            setTimeout(() => {
+                document.getElementById('result-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+            
+            showToast(`Berhasil menyusun ${selectedSoal.length} soal dari Bank!`);
+        }
+
+        // --- LOGIC EDIT MANUAL ---
+        function bukaModalEdit(id) {
+            // Cari data soal berdasarkan ID (kolom indeks 0)
+            const soal = bankSoalData.find(row => String(row[0]) === String(id));
+            if (!soal) return;
+
+            // Isi form dengan data yang ada
+            document.getElementById('edit-id').value = soal[0];
+            document.getElementById('edit-mapel').value = soal[2] || '';
+            document.getElementById('edit-kelas').value = soal[3] || '';
+            document.getElementById('edit-materi').value = soal[4] || '';
+            document.getElementById('edit-soal').value = soal[7] || '';
+            document.getElementById('edit-pila').value = soal[8] || '';
+            document.getElementById('edit-pilb').value = soal[9] || '';
+            document.getElementById('edit-pilc').value = soal[10] || '';
+            document.getElementById('edit-pild').value = soal[11] || '';
+            document.getElementById('edit-jawaban').value = soal[12] || '';
+            document.getElementById('edit-pembahasan').value = soal[13] || '';
+
+            // Tampilkan Modal
+            const modal = document.getElementById('modal-edit');
+            modal.classList.remove('hidden');
+        }
+
+        function tutupModalEdit() {
+            document.getElementById('modal-edit').classList.add('hidden');
+        }
+
+        async function simpanEditSoal() {
+            if (!appSettings.gasUrl) return;
+
+            const btn = document.getElementById('btn-save-edit');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+            btn.disabled = true;
+
+            // Ambil data dari form
+            const payload = {
+                action: "edit",
+                data: {
+                    id: document.getElementById('edit-id').value,
+                    mapel: document.getElementById('edit-mapel').value,
+                    kelas: document.getElementById('edit-kelas').value,
+                    materi: document.getElementById('edit-materi').value,
+                    soal: document.getElementById('edit-soal').value,
+                    pilA: document.getElementById('edit-pila').value,
+                    pilB: document.getElementById('edit-pilb').value,
+                    pilC: document.getElementById('edit-pilc').value,
+                    pilD: document.getElementById('edit-pild').value,
+                    jawaban: document.getElementById('edit-jawaban').value,
+                    pembahasan: document.getElementById('edit-pembahasan').value
+                }
+            };
+
+            try {
+                const response = await fetch(appSettings.gasUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    showToast("Soal berhasil diperbarui!");
+                    tutupModalEdit();
+                    loadBankSoal(); // Refresh tabel dari database terbaru
+                } else {
+                    showToast("Gagal: " + (result.message || "Kesalahan server"), "error");
+                }
+
+            } catch (error) {
+                console.error(error);
+                showToast("Gagal menyimpan perubahan. Cek koneksi / URL.", "error");
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
             }
         }
     </script>

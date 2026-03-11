@@ -408,7 +408,10 @@
                     <div class="space-y-6">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Google Gemini API Key</label>
-                            <p class="text-xs text-gray-500 mb-2">Dapatkan API key secara gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 hover:underline">Google AI Studio</a>.</p>
+                            <p class="text-xs text-gray-500 mb-2">
+                                Dapatkan API key secara gratis di Google AI Studio. 
+                                <button onclick="bukaPanduanAPI()" class="text-blue-600 hover:text-blue-800 hover:underline font-medium ml-1"><i class="fas fa-question-circle"></i> Lihat panduan cara mendapatkannya</button>
+                            </p>
                             <input type="password" id="setting-gemini-key" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-primary focus:border-primary" placeholder="AIzaSy...">
                         </div>
 
@@ -524,10 +527,47 @@
                     <p class="text-sm">Masukkan kata sandi untuk membuka halaman Pengaturan Sistem.</p>
                 </div>
                 <input type="password" id="input-password-settings" class="w-full border border-gray-300 rounded-lg p-3 text-center tracking-widest focus:ring-primary focus:border-primary mb-5" placeholder="Kata Sandi..." onkeyup="if(event.key === 'Enter') verifyPassword()">
-                <div class="flex justify-center space-x-3">
+                <div class="flex justify-center space-x-3 mb-5">
                     <button onclick="closePasswordModal()" class="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition text-sm font-medium w-full">Batal</button>
                     <button onclick="verifyPassword()" class="px-5 py-2.5 bg-primary text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium w-full">Buka Akses</button>
                 </div>
+                
+                <!-- Info Hubungi WhatsApp -->
+                <div class="mt-2 pt-4 border-t border-gray-200 text-xs text-gray-600">
+                    <p class="mb-2 font-medium">Informasi password silahkan hubungi:</p>
+                    <a href="https://wa.me/6282371962881" target="_blank" class="inline-flex items-center justify-center px-4 py-2 bg-[#25D366] text-white rounded-lg hover:bg-green-600 transition font-semibold w-full">
+                        <i class="fab fa-whatsapp text-lg mr-2"></i> WhatsApp (+6282371962881)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Panduan API Key -->
+    <div id="modal-panduan-api" class="fixed inset-0 bg-black bg-opacity-50 z-[120] hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-key text-primary mr-2"></i>Cara Mendapatkan API Key</h3>
+                <button onclick="tutupPanduanAPI()" class="text-gray-400 hover:text-red-500 transition focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto text-sm text-gray-700 space-y-4">
+                <ol class="list-decimal pl-5 space-y-3">
+                    <li>Buka situs web <strong><a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 hover:underline">Google AI Studio (Klik di sini)</a></strong>.</li>
+                    <li>Login menggunakan akun Google (Gmail) Anda.</li>
+                    <li>Di halaman utama, cari dan klik tombol biru bertuliskan <strong>"Get API key"</strong> atau <strong>"Create API key"</strong>.</li>
+                    <li>Pilih opsi <strong>"Create API key in new project"</strong>.</li>
+                    <li>Tunggu beberapa saat sampai kode kunci API Anda muncul.</li>
+                    <li>Klik <strong>Copy</strong> pada baris kode API Key tersebut.</li>
+                    <li>Kembali ke aplikasi ini, paste (tempel) kunci tersebut ke kolom <strong>Google Gemini API Key</strong>, lalu klik tombol "Simpan Pengaturan".</li>
+                </ol>
+                <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-xs">
+                    <strong>Catatan:</strong> API Key Anda bersifat rahasia dan akan disimpan dengan aman di dalam browser perangkat Anda (Local Storage).
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t bg-gray-50 flex justify-end">
+                <button onclick="tutupPanduanAPI()" class="px-5 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium w-full sm:w-auto">Saya Mengerti</button>
             </div>
         </div>
     </div>
@@ -543,7 +583,7 @@
         // --- GLOBAL VARIABLES ---
         let currentSoalData = [];
         let appSettings = {
-            geminiKey: localStorage.getItem('sd_gemini_key') || 'AIzaSyCFc8AI9OROgNEaceUv5wvXPjVX_vJsMr0',
+            geminiKey: localStorage.getItem('sd_gemini_key') || '',
             gasUrl: localStorage.getItem('sd_gas_url') || 'https://script.google.com/macros/s/AKfycbzV5ANNawAX1B51bnQ9BI8doJEjmqQvGnldRcfLNJqiJlfTwDe2wdV4RL3_KC2Nmd_FHA/exec'
         };
         let bankSoalData = [];
@@ -1259,6 +1299,15 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                 input.value = ''; // Kosongkan
                 input.focus(); // Fokus lagi untuk mencoba ulang
             }
+        }
+
+        // --- PANDUAN API LOGIC ---
+        function bukaPanduanAPI() {
+            document.getElementById('modal-panduan-api').classList.remove('hidden');
+        }
+
+        function tutupPanduanAPI() {
+            document.getElementById('modal-panduan-api').classList.add('hidden');
         }
     </script>
 </body>

@@ -193,37 +193,53 @@
                         </div>
 
                         <!-- Baris 2: Jenis Soal & Kesulitan -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                             
-                            <!-- JENIS SOAL (CHECKBOXES) -->
+                            <!-- JENIS SOAL (CHECKBOXES + JUMLAH) -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Soal <span class="text-xs font-normal text-gray-500">(Bisa pilih lebih dari satu)</span></label>
-                                <div class="grid grid-cols-2 gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50 h-[86px]">
-                                    <label class="flex items-center space-x-3 cursor-pointer p-1 rounded hover:bg-gray-100 transition">
-                                        <input type="checkbox" value="Pilihan Ganda" class="chk-jenis-soal w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary" checked>
-                                        <span class="text-sm font-medium text-gray-700">Pilihan Ganda</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer p-1 rounded hover:bg-gray-100 transition">
-                                        <input type="checkbox" value="Isian Singkat" class="chk-jenis-soal w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary">
-                                        <span class="text-sm font-medium text-gray-700">Isian Singkat</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer p-1 rounded hover:bg-gray-100 transition">
-                                        <input type="checkbox" value="Benar / Salah" class="chk-jenis-soal w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary">
-                                        <span class="text-sm font-medium text-gray-700">Benar / Salah</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer p-1 rounded hover:bg-gray-100 transition">
-                                        <input type="checkbox" value="Uraian" class="chk-jenis-soal w-4 h-4 text-primary bg-white border-gray-300 rounded focus:ring-primary">
-                                        <span class="text-sm font-medium text-gray-700">Uraian</span>
-                                    </label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Soal & Jumlah</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50 h-full">
+                                    <!-- Pilihan Ganda -->
+                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full min-h-[38px]">
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="checkbox" id="chk-pg" value="Pilihan Ganda" class="chk-jenis-soal w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" checked onchange="toggleInputJenis('pg')">
+                                            <span class="ml-1.5 text-xs font-medium text-gray-700">Pilihan Ganda</span>
+                                        </label>
+                                        <input type="number" id="jml-pg" min="1" max="50" value="5" class="w-10 border border-gray-300 rounded py-0.5 px-1 text-xs text-center focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <!-- Isian Singkat -->
+                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full min-h-[38px]">
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="checkbox" id="chk-isian" value="Isian Singkat" class="chk-jenis-soal w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" onchange="toggleInputJenis('isian')">
+                                            <span class="ml-1.5 text-xs font-medium text-gray-700">Isian Singkat</span>
+                                        </label>
+                                        <input type="number" id="jml-isian" min="1" max="50" value="5" disabled class="w-10 border border-gray-300 rounded py-0.5 px-1 text-xs text-center disabled:bg-gray-100 disabled:text-gray-400 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <!-- Benar / Salah -->
+                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full min-h-[38px]">
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="checkbox" id="chk-bs" value="Benar / Salah" class="chk-jenis-soal w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" onchange="toggleInputJenis('bs')">
+                                            <span class="ml-1.5 text-xs font-medium text-gray-700">Benar / Salah</span>
+                                        </label>
+                                        <input type="number" id="jml-bs" min="1" max="50" value="5" disabled class="w-10 border border-gray-300 rounded py-0.5 px-1 text-xs text-center disabled:bg-gray-100 disabled:text-gray-400 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <!-- Uraian -->
+                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full min-h-[38px]">
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="checkbox" id="chk-uraian" value="Uraian" class="chk-jenis-soal w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" onchange="toggleInputJenis('uraian')">
+                                            <span class="ml-1.5 text-xs font-medium text-gray-700">Uraian</span>
+                                        </label>
+                                        <input type="number" id="jml-uraian" min="1" max="50" value="5" disabled class="w-10 border border-gray-300 rounded py-0.5 px-1 text-xs text-center disabled:bg-gray-100 disabled:text-gray-400 focus:ring-primary focus:border-primary">
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- TINGKAT KESULITAN & JUMLAH -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Tingkat Kesulitan & Jumlah Total Soal</label>
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50 h-[86px] overflow-hidden">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50 h-full">
                                     <!-- Mudah -->
-                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full">
+                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full min-h-[38px]">
                                         <label class="flex items-center cursor-pointer">
                                             <input type="checkbox" id="chk-mudah" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" onchange="toggleInput('mudah')">
                                             <span class="ml-1.5 text-xs font-medium text-gray-700">Mudah</span>
@@ -231,7 +247,7 @@
                                         <input type="number" id="jml-mudah" min="1" max="50" value="5" disabled class="w-10 border border-gray-300 rounded py-0.5 px-1 text-xs text-center disabled:bg-gray-100 disabled:text-gray-400 focus:ring-primary focus:border-primary">
                                     </div>
                                     <!-- Sedang -->
-                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full">
+                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full min-h-[38px]">
                                         <label class="flex items-center cursor-pointer">
                                             <input type="checkbox" id="chk-sedang" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" onchange="toggleInput('sedang')">
                                             <span class="ml-1.5 text-xs font-medium text-gray-700">Sedang</span>
@@ -239,7 +255,7 @@
                                         <input type="number" id="jml-sedang" min="1" max="50" value="5" disabled class="w-10 border border-gray-300 rounded py-0.5 px-1 text-xs text-center disabled:bg-gray-100 disabled:text-gray-400 focus:ring-primary focus:border-primary">
                                     </div>
                                     <!-- Sulit -->
-                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full">
+                                    <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded border border-gray-200 shadow-sm h-full min-h-[38px]">
                                         <label class="flex items-center cursor-pointer">
                                             <input type="checkbox" id="chk-sulit" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" onchange="toggleInput('sulit')">
                                             <span class="ml-1.5 text-xs font-medium text-gray-700">Sulit</span>
@@ -637,6 +653,21 @@
             document.getElementById('btn-' + tabId).classList.add('tab-active');
         }
 
+        function toggleInputJenis(jenis) {
+            const checkbox = document.getElementById(`chk-${jenis}`);
+            const input = document.getElementById(`jml-${jenis}`);
+            
+            if (checkbox.checked) {
+                input.disabled = false;
+                if (input.value === "" || input.value <= 0) {
+                    input.value = "5"; 
+                }
+                input.focus();
+            } else {
+                input.disabled = true;
+            }
+        }
+
         function toggleInput(level) {
             const checkbox = document.getElementById(`chk-${level}`);
             const input = document.getElementById(`jml-${level}`);
@@ -724,14 +755,32 @@
                 return;
             }
 
-            const checkboxJenis = document.querySelectorAll('.chk-jenis-soal:checked');
-            const jenisTerpilih = Array.from(checkboxJenis).map(cb => cb.value);
+            // --- AMBIL DATA JENIS SOAL ---
+            const isPG = document.getElementById('chk-pg').checked;
+            const isIsian = document.getElementById('chk-isian').checked;
+            const isBS = document.getElementById('chk-bs').checked;
+            const isUraian = document.getElementById('chk-uraian').checked;
 
-            if (jenisTerpilih.length === 0) {
-                alert("Centang minimal satu Jenis Soal!");
+            const jmlPG = isPG ? parseInt(document.getElementById('jml-pg').value) || 0 : 0;
+            const jmlIsian = isIsian ? parseInt(document.getElementById('jml-isian').value) || 0 : 0;
+            const jmlBS = isBS ? parseInt(document.getElementById('jml-bs').value) || 0 : 0;
+            const jmlUraian = isUraian ? parseInt(document.getElementById('jml-uraian').value) || 0 : 0;
+
+            const totalJenis = jmlPG + jmlIsian + jmlBS + jmlUraian;
+
+            let jenisTerpilih = [];
+            let rincianJenisList = [];
+            if (isPG) { rincianJenisList.push(`- ${jmlPG} soal Pilihan Ganda`); jenisTerpilih.push("Pilihan Ganda"); }
+            if (isIsian) { rincianJenisList.push(`- ${jmlIsian} soal Isian Singkat`); jenisTerpilih.push("Isian Singkat"); }
+            if (isBS) { rincianJenisList.push(`- ${jmlBS} soal Benar / Salah`); jenisTerpilih.push("Benar / Salah"); }
+            if (isUraian) { rincianJenisList.push(`- ${jmlUraian} soal Uraian`); jenisTerpilih.push("Uraian"); }
+
+            if (totalJenis === 0) {
+                alert("Centang minimal satu Jenis Soal dan tentukan jumlahnya!");
                 return;
             }
 
+            // --- AMBIL DATA TINGKAT KESULITAN ---
             const isMudah = document.getElementById('chk-mudah').checked;
             const isSedang = document.getElementById('chk-sedang').checked;
             const isSulit = document.getElementById('chk-sulit').checked;
@@ -740,12 +789,20 @@
             const jmlSedang = isSedang ? parseInt(document.getElementById('jml-sedang').value) || 0 : 0;
             const jmlSulit = isSulit ? parseInt(document.getElementById('jml-sulit').value) || 0 : 0;
 
-            const totalSoal = jmlMudah + jmlSedang + jmlSulit;
+            const totalKesulitan = jmlMudah + jmlSedang + jmlSulit;
 
-            if (totalSoal === 0) {
-                alert("Centang minimal satu tingkat kesulitan dan tentukan jumlah soalnya!");
+            if (totalKesulitan === 0) {
+                alert("Centang minimal satu Tingkat Kesulitan dan tentukan jumlah soalnya!");
                 return;
             }
+
+            // --- VALIDASI TOTAL JUMLAH SOAL ---
+            if (totalJenis !== totalKesulitan) {
+                alert(`Terdapat ketidaksesuaian jumlah soal:\n\nTotal pada Jenis Soal = ${totalJenis} soal.\nTotal pada Tingkat Kesulitan = ${totalKesulitan} soal.\n\nKedua total ini HARUS SAMA. Silakan sesuaikan angka jumlah soalnya.`);
+                return;
+            }
+
+            const totalSoal = totalJenis; // Keduanya sama
 
             let rincianList = [];
             if (jmlMudah > 0) rincianList.push(`- ${jmlMudah} soal tingkat MUDAH`);
@@ -767,10 +824,10 @@ Anda adalah guru Sekolah Dasar yang ahli membuat soal ujian.
 Buatkan total ${totalSoal} soal untuk ${kelas} mata pelajaran ${mapel}.
 Materi atau Tema: "${materi}".
 
-Jenis soal yang dibuat harus terdiri dari kombinasi: ${jenisTerpilih.join(', ')}.
-Mohon bagikan jumlah soal secara proporsional atau acak di antara jenis-jenis soal yang diminta tersebut.
+Rincian JENIS SOAL yang harus dibuat secara persis (total ${totalSoal} soal):
+${rincianJenisList.join('\n')}
 
-Rincian jumlah dan tingkat kesulitan yang harus diikuti secara persis (total ${totalSoal} soal):
+Rincian TINGKAT KESULITAN yang harus didistribusikan ke dalam soal-soal di atas (total ${totalSoal} soal):
 ${rincianList.join('\n')}
 
 Syarat Output HARUS berupa valid JSON Array of Objects murni tanpa text markdown apapun. Format JSON:

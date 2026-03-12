@@ -105,6 +105,15 @@
 
             <!-- Dashboard Section -->
             <section id="dashboard" class="page-section">
+                <!-- Kartu Selamat Datang (Dipindah ke atas) -->
+                <div class="bg-white rounded-xl shadow-sm p-8 text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang di PESONA-AI</h2>
+                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">Asisten cerdas Anda untuk membuat soal latihan, ulangan harian, dan evaluasi bagi siswa Sekolah Dasar dengan cepat dan mudah menggunakan bantuan Artificial Intelligence.</p>
+                    <button onclick="switchTab('generator')" class="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
+                        <i class="fas fa-plus mr-2"></i> Mulai Buat Soal
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-primary">
                         <div class="flex items-center justify-between">
@@ -141,12 +150,27 @@
                     </div>
                 </div>
                 
-                <div class="bg-white rounded-xl shadow-sm p-8 text-center">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang di PESONA-AI</h2>
-                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">Asisten cerdas Anda untuk membuat soal latihan, ulangan harian, dan evaluasi bagi siswa Sekolah Dasar dengan cepat dan mudah menggunakan bantuan Artificial Intelligence.</p>
-                    <button onclick="switchTab('generator')" class="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
-                        <i class="fas fa-plus mr-2"></i> Mulai Buat Soal
-                    </button>
+                <!-- Rincian Data Bank Soal -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Sebaran Mapel -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-3"><i class="fas fa-chart-pie text-primary mr-2"></i>Sebaran Mata Pelajaran</h3>
+                        <div id="stat-mapel-list" class="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                            <div class="flex items-center text-gray-500 italic text-sm">
+                                <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data dari bank soal...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sebaran Kelas -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-3"><i class="fas fa-chart-bar text-secondary mr-2"></i>Sebaran Kelas</h3>
+                        <div id="stat-kelas-list" class="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                            <div class="flex items-center text-gray-500 italic text-sm">
+                                <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data dari bank soal...
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -610,6 +634,11 @@
             updateApiStatus();
             document.getElementById('setting-gemini-key').value = appSettings.geminiKey;
             document.getElementById('setting-gas-url').value = appSettings.gasUrl;
+            
+            // Memuat data bank soal di latar belakang agar dashboard memiliki data yang up-to-date
+            setTimeout(() => {
+                if (appSettings.gasUrl) loadBankSoal();
+            }, 500);
         };
 
         // --- UI & NAVIGATION ---
@@ -1066,10 +1095,71 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                     bankSoalData = data.data; 
                     renderTableBank(bankSoalData);
                     document.getElementById('stat-bank').innerText = bankSoalData.length;
+                    
+                    // Update rincian statistik dashboard
+                    updateDashboardStats();
                 }
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Gagal memuat data. Pastikan URL GAS benar.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500">Gagal memuat data. Pastikan URL GAS benar.</td></tr>`;
             }
+        }
+
+        function updateDashboardStats() {
+            const mapelContainer = document.getElementById('stat-mapel-list');
+            const kelasContainer = document.getElementById('stat-kelas-list');
+
+            if(!bankSoalData || bankSoalData.length === 0) {
+                mapelContainer.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada data di bank soal.</p>';
+                kelasContainer.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada data di bank soal.</p>';
+                return;
+            }
+
+            let mapelCount = {};
+            let kelasCount = {};
+
+            // Hitung jumlah soal per mapel dan kelas
+            bankSoalData.forEach(row => {
+                let mapel = row[2] || 'Lainnya';
+                let kelas = row[3] || 'Lainnya';
+                mapelCount[mapel] = (mapelCount[mapel] || 0) + 1;
+                kelasCount[kelas] = (kelasCount[kelas] || 0) + 1;
+            });
+
+            // Render Progress Bar Mapel
+            mapelContainer.innerHTML = '';
+            const sortedMapel = Object.entries(mapelCount).sort((a,b) => b[1] - a[1]);
+            sortedMapel.forEach(([name, count]) => {
+                let pct = Math.round((count / bankSoalData.length) * 100);
+                mapelContainer.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-sm mb-1.5">
+                            <span class="font-medium text-gray-700">${name}</span>
+                            <span class="text-gray-500 text-xs">${count} soal (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-primary h-2 rounded-full" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render Progress Bar Kelas
+            kelasContainer.innerHTML = '';
+            const sortedKelas = Object.entries(kelasCount).sort((a,b) => a[0].localeCompare(b[0]));
+            sortedKelas.forEach(([name, count]) => {
+                let pct = Math.round((count / bankSoalData.length) * 100);
+                kelasContainer.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-sm mb-1.5">
+                            <span class="font-medium text-gray-700">${name}</span>
+                            <span class="text-gray-500 text-xs">${count} soal (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-secondary h-2 rounded-full" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         function renderTableBank(dataList) {

@@ -848,6 +848,13 @@
             document.getElementById('kop-kelas').innerText = kelas;
             document.getElementById('kop-materi').innerText = materi;
             
+            // Re-enable tombol simpan ke bank untuk soal baru yang di-generate AI
+            const btnSave = document.getElementById('btn-save-sheet');
+            if(btnSave) {
+                btnSave.disabled = false;
+                btnSave.title = "Simpan ke Bank";
+            }
+            
             const promptText = `
 Anda adalah guru Sekolah Dasar yang ahli membuat soal ujian.
 Buatkan total ${totalSoal} soal untuk ${kelas} mata pelajaran ${mapel}.
@@ -1309,31 +1316,44 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                     nomor: index + 1,
                     kesulitan: kesulitan,
                     jenis_soal: jenis,
-                    soal: row[7],
+                    soal: row[7] || '',
                     pilihan: pilihanObj,
-                    jawaban: row[12],
-                    pembahasan: row[13]
+                    jawaban: row[12] || '-',
+                    pembahasan: row[13] || '-'
                 };
             });
 
             // Atur Kop Surat Otomatis
-            const mapels = [...new Set(selectedSoal.map(r => r[2]))];
-            const kelass = [...new Set(selectedSoal.map(r => r[3]))];
-            const materis = [...new Set(selectedSoal.map(r => r[4]))];
+            const mapels = [...new Set(selectedSoal.map(r => r[2] || '-'))];
+            const kelass = [...new Set(selectedSoal.map(r => r[3] || '-'))];
+            const materis = [...new Set(selectedSoal.map(r => r[4] || '-'))];
 
             document.getElementById('kop-judul').innerText = "LATIHAN SOAL (DARI BANK SOAL)";
-            document.getElementById('kop-mapel').innerText = mapels.length > 1 ? "Campuran" : (mapels[0] || "-");
-            document.getElementById('kop-kelas').innerText = kelass.length > 1 ? "Campuran" : (kelass[0] || "-");
-            document.getElementById('kop-materi').innerText = materis.length > 1 ? "Campuran" : (materis[0] || "-");
+            document.getElementById('kop-mapel').innerText = mapels.length > 1 ? "Campuran" : mapels[0];
+            document.getElementById('kop-kelas').innerText = kelass.length > 1 ? "Campuran" : kelass[0];
+            document.getElementById('kop-materi').innerText = materis.length > 1 ? "Campuran" : materis[0];
 
             // Tampilkan ke Output Area
             renderSoal();
             document.getElementById('placeholder-result').classList.add('hidden');
             document.getElementById('kop-surat').classList.remove('hidden');
             
+            // Cegah duplikasi penyimpanan ke bank soal
+            const btnSave = document.getElementById('btn-save-sheet');
+            if(btnSave) {
+                btnSave.disabled = true;
+                btnSave.title = "Soal ini sudah berasal dari bank soal";
+            }
+            
             // Pindahkan tab ke Generator/Output dan tampilkan Lembar Soal
             switchTab('generator');
             switchResultTab('tab-soal');
+            
+            // Bersihkan checklist setelah berhasil dibuat
+            selectedBankSoalIds.clear();
+            document.querySelectorAll('.chk-soal').forEach(cb => cb.checked = false);
+            if(document.getElementById('chk-all')) document.getElementById('chk-all').checked = false;
+            updateSelectedCount();
             
             // Scroll otomatis ke area hasil
             setTimeout(() => {

@@ -41,8 +41,11 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans h-screen flex overflow-hidden relative">
 
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[40] hidden md:hidden transition-opacity" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-primary text-white flex flex-col transition-all duration-300 z-20">
+    <aside id="sidebar" class="w-64 bg-primary text-white flex flex-col transition-transform duration-300 z-[50] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 flex-shrink-0">
         <div class="p-6 border-b border-blue-800">
             <div class="flex items-center space-x-3 mb-1">
                 <i class="fas fa-robot text-3xl text-secondary"></i>
@@ -68,6 +71,9 @@
             <button onclick="openSettingsWithPassword()" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition hover:bg-blue-700" data-target="settings">
                 <i class="fas fa-cog w-5"></i><span>Pengaturan</span>
             </button>
+            <button onclick="bukaModalDonasi()" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 mt-4 rounded-lg text-left transition hover:bg-blue-700 text-yellow-300 hover:text-yellow-100 border border-blue-700 bg-blue-800/50" data-target="donasi">
+                <i class="fas fa-hand-holding-heart w-5 text-red-400"></i><span class="font-semibold">Donasi / Dukungan</span>
+            </button>
         </nav>
         <div class="p-4 text-xs text-blue-300 text-center border-t border-blue-800">
             &copy; 2026 PESONA-AI
@@ -75,26 +81,26 @@
     </aside>
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+    <main id="main-content" class="flex-1 flex flex-col h-full overflow-hidden relative z-10 w-full">
         
         <!-- Header -->
-        <header id="header" class="bg-white shadow-sm h-16 flex items-center justify-between px-6 z-10">
+        <header id="header" class="bg-white shadow-sm h-16 flex items-center justify-between px-4 sm:px-6 z-10 flex-shrink-0">
             <div class="flex items-center">
                 <button onclick="toggleSidebar()" class="text-gray-500 hover:text-primary focus:outline-none md:hidden mr-4">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
-                <h2 id="page-title" class="text-xl font-semibold text-gray-700">Dashboard</h2>
+                <h2 id="page-title" class="text-lg sm:text-xl font-semibold text-gray-700 truncate max-w-[150px] sm:max-w-none">Dashboard</h2>
             </div>
-            <div class="flex items-center space-x-4">
-                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded flex items-center">
-                    <span id="api-status-dot" class="w-2 h-2 bg-red-500 rounded-full mr-1.5"></span>
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <span class="bg-green-100 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-2.5 sm:py-0.5 rounded flex items-center whitespace-nowrap">
+                    <span id="api-status-dot" class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full mr-1 sm:mr-1.5"></span>
                     <span id="api-status-text">API Belum Diatur</span>
                 </span>
             </div>
         </header>
 
         <!-- Content Area -->
-        <div class="flex-1 overflow-y-auto p-6 relative">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 relative w-full">
             
             <!-- Loading Overlay -->
             <div id="loading-overlay" class="hidden absolute inset-0 bg-white bg-opacity-80 z-50 flex flex-col justify-center items-center rounded-xl">
@@ -105,15 +111,6 @@
 
             <!-- Dashboard Section -->
             <section id="dashboard" class="page-section">
-                <!-- Kartu Selamat Datang (Dipindah ke atas) -->
-                <div class="bg-white rounded-xl shadow-sm p-8 text-center mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang di PESONA-AI</h2>
-                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">Asisten cerdas Anda untuk membuat soal latihan, ulangan harian, dan evaluasi bagi siswa Sekolah Dasar dengan cepat dan mudah menggunakan bantuan Artificial Intelligence.</p>
-                    <button onclick="switchTab('generator')" class="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
-                        <i class="fas fa-plus mr-2"></i> Mulai Buat Soal
-                    </button>
-                </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-primary">
                         <div class="flex items-center justify-between">
@@ -150,27 +147,12 @@
                     </div>
                 </div>
                 
-                <!-- Rincian Data Bank Soal -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <!-- Sebaran Mapel -->
-                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-3"><i class="fas fa-chart-pie text-primary mr-2"></i>Sebaran Mata Pelajaran</h3>
-                        <div id="stat-mapel-list" class="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2">
-                            <div class="flex items-center text-gray-500 italic text-sm">
-                                <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data dari bank soal...
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Sebaran Kelas -->
-                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-3"><i class="fas fa-chart-bar text-secondary mr-2"></i>Sebaran Kelas</h3>
-                        <div id="stat-kelas-list" class="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2">
-                            <div class="flex items-center text-gray-500 italic text-sm">
-                                <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data dari bank soal...
-                            </div>
-                        </div>
-                    </div>
+                <div class="bg-white rounded-xl shadow-sm p-8 text-center">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang di PESONA-AI</h2>
+                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">Asisten cerdas Anda untuk membuat soal latihan, ulangan harian, dan evaluasi bagi siswa dengan cepat dan mudah menggunakan bantuan Artificial Intelligence.</p>
+                    <button onclick="switchTab('generator')" class="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
+                        <i class="fas fa-plus mr-2"></i> Mulai Buat Soal
+                    </button>
                 </div>
             </section>
 
@@ -182,19 +164,15 @@
                     <div class="w-full bg-white rounded-xl shadow-sm p-6 no-print">
                         <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4"><i class="fas fa-sliders-h mr-2 text-primary"></i>Pengaturan Soal</h3>
                         
-                        <!-- Baris 1: Mapel, Kelas, Materi -->
+                        <!-- Baris 1: Jenjang, Mapel, Kelas, Materi -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
-                                <select id="gen-mapel" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-primary focus:border-primary bg-white">
-                                    <option value="Matematika">Matematika</option>
-                                    <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                                    <option value="IPAS">IPAS</option>
-                                    <option value="PPKn">PPKn</option>
-                                    <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
-                                    <option value="Seni Budaya">Seni Budaya</option>
-                                    <option value="PJOK">PJOK</option>
-                                    <option value="Bahasa Inggris">Bahasa Inggris</option>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Jenjang</label>
+                                <select id="gen-jenjang" onchange="updateKelas()" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-primary focus:border-primary bg-white">
+                                    <option value="SD">SD</option>
+                                    <option value="SMP">SMP</option>
+                                    <option value="SMA">SMA</option>
+                                    <option value="SMK">SMK</option>
                                 </select>
                             </div>
 
@@ -211,8 +189,32 @@
                             </div>
 
                             <div class="lg:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
+                                <select id="gen-mapel" onchange="checkMapelLainnya()" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-primary focus:border-primary bg-white mb-2">
+                                    <option value="Matematika">Matematika</option>
+                                    <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                    <option value="IPAS / IPA">IPAS / IPA</option>
+                                    <option value="IPS">IPS</option>
+                                    <option value="Pendidikan Pancasila (PPKn)">Pendidikan Pancasila (PPKn)</option>
+                                    <option value="Pendidikan Agama">Pendidikan Agama</option>
+                                    <option value="Seni Budaya">Seni Budaya</option>
+                                    <option value="PJOK">PJOK</option>
+                                    <option value="Bahasa Inggris">Bahasa Inggris</option>
+                                    <option value="Informatika">Informatika</option>
+                                    <option value="Sejarah">Sejarah</option>
+                                    <option value="Lainnya / Kejuruan">Lainnya / Kejuruan</option>
+                                </select>
+                                <input type="text" id="gen-mapel-lainnya" placeholder="Ketik mata pelajaran secara manual..." class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-primary focus:border-primary hidden">
+                            </div>
+
+                            <div class="md:col-span-2 lg:col-span-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Materi / Bab / Tema</label>
-                                <input type="text" id="gen-materi" placeholder="Contoh: Pecahan, Gaya Gesek, dll" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-primary focus:border-primary">
+                                <input type="text" id="gen-materi" placeholder="Contoh: Pecahan, Gaya Gesek, Teks Prosedur, dll" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-primary focus:border-primary">
+                            </div>
+
+                            <div class="md:col-span-2 lg:col-span-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tujuan Pembelajaran (Opsional)</label>
+                                <textarea id="gen-tujuan" placeholder="Contoh: Siswa dapat mengidentifikasi ciri-ciri makhluk hidup dengan benar." rows="2" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-primary focus:border-primary resize-y"></textarea>
                             </div>
                         </div>
 
@@ -302,13 +304,13 @@
                     <div class="w-full bg-white rounded-xl shadow-sm flex flex-col print-container min-h-[500px]">
                         
                         <!-- Toolbar Hasil -->
-                        <div class="p-4 border-b border-gray-200 flex flex-wrap justify-between items-center bg-gray-50 rounded-t-xl no-print">
-                            <div class="flex space-x-2">
-                                <button onclick="switchResultTab('tab-soal')" id="btn-tab-soal" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 tab-active transition-colors">Lembar Soal</button>
-                                <button onclick="switchResultTab('tab-kunci')" id="btn-tab-kunci" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors">Kunci Jawaban</button>
-                                <button onclick="switchResultTab('tab-bahas')" id="btn-tab-bahas" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors">Pembahasan</button>
+                        <div class="p-4 border-b border-gray-200 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center bg-gray-50 rounded-t-xl no-print w-full overflow-hidden">
+                            <div class="flex space-x-2 w-full overflow-x-auto pb-2 lg:pb-0 custom-scrollbar">
+                                <button onclick="switchResultTab('tab-soal')" id="btn-tab-soal" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 tab-active transition-colors whitespace-nowrap text-sm sm:text-base">Lembar Soal</button>
+                                <button onclick="switchResultTab('tab-kunci')" id="btn-tab-kunci" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap text-sm sm:text-base">Kunci Jawaban</button>
+                                <button onclick="switchResultTab('tab-bahas')" id="btn-tab-bahas" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap text-sm sm:text-base">Pembahasan</button>
                             </div>
-                            <div class="flex space-x-2 mt-2 sm:mt-0">
+                            <div class="flex flex-wrap gap-2 mt-2 lg:mt-0 w-full lg:w-auto justify-start lg:justify-end">
                                 <button onclick="acakSoal()" class="px-3 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm flex items-center transition" title="Acak urutan soal">
                                     <i class="fas fa-random mr-1"></i> Acak
                                 </button>
@@ -318,11 +320,14 @@
                                 <button onclick="cetakPDF()" class="px-3 py-1.5 bg-gray-800 text-white rounded hover:bg-gray-900 text-sm flex items-center transition">
                                     <i class="fas fa-print mr-1"></i> Cetak / PDF
                                 </button>
+                                <button onclick="exportToWord()" class="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm flex items-center transition">
+                                    <i class="fas fa-file-word mr-1"></i> Word
+                                </button>
                             </div>
                         </div>
 
                         <!-- Area Tampilan Data -->
-                        <div class="p-8 flex-1 overflow-y-auto" id="result-container">
+                        <div class="p-4 sm:p-8 flex-1 overflow-y-auto" id="result-container">
                             <div id="placeholder-result" class="h-full flex flex-col items-center justify-center text-gray-400 py-10">
                                 <i class="far fa-file-alt text-6xl mb-4 text-gray-300"></i>
                                 <p>Silakan isi form pengaturan di atas lalu klik "Generate Soal AI".</p>
@@ -366,10 +371,10 @@
 
             <!-- Bank Soal Section -->
             <section id="bank" class="page-section hidden h-full flex flex-col">
-                <div class="bg-white rounded-xl shadow-sm p-4 mb-4 flex flex-wrap gap-4 justify-between items-center no-print">
-                    <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-4 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center no-print w-full">
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-3 w-full md:w-auto">
                         <!-- Dropdown Filter Mata Pelajaran (Disamakan dengan Generator) -->
-                        <select id="filter-mapel" onchange="filterBankSoal()" class="w-full md:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
+                        <select id="filter-mapel" onchange="filterBankSoal()" class="w-full sm:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
                             <option value="">Semua Mata Pelajaran</option>
                             <option value="Matematika">Matematika</option>
                             <option value="Bahasa Indonesia">Bahasa Indonesia</option>
@@ -390,24 +395,30 @@
                             <option value="Kelas 4">Kelas 4</option>
                             <option value="Kelas 5">Kelas 5</option>
                             <option value="Kelas 6">Kelas 6</option>
+                            <option value="Kelas 7">Kelas 7</option>
+                            <option value="Kelas 8">Kelas 8</option>
+                            <option value="Kelas 9">Kelas 9</option>
+                            <option value="Kelas 10">Kelas 10</option>
+                            <option value="Kelas 11">Kelas 11</option>
+                            <option value="Kelas 12">Kelas 12</option>
                         </select>
 
                         <!-- Input Pencarian -->
-                        <div class="relative w-full md:w-64">
+                        <div class="relative w-full sm:w-64">
                             <input type="text" id="filter-search" onkeyup="filterBankSoal()" placeholder="Cari soal/materi..." class="w-full p-2 pl-9 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
                             <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
                         </div>
                     </div>
-                    <div>
-                        <button onclick="loadBankSoal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
+                    <div class="w-full md:w-auto flex justify-end">
+                        <button onclick="loadBankSoal()" class="w-full md:w-auto bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
                             <i class="fas fa-sync-alt mr-1"></i> Refresh
                         </button>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm flex-1 overflow-hidden flex flex-col">
-                    <div class="overflow-y-auto flex-1 p-0 custom-scrollbar">
-                        <table class="w-full text-left border-collapse">
+                    <div class="overflow-x-auto overflow-y-auto flex-1 p-0 custom-scrollbar w-full">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead class="bg-gray-100 sticky top-0 z-10 text-gray-600 text-sm shadow-sm">
                                 <tr>
                                     <th class="p-4 border-b w-10 text-center">
@@ -429,12 +440,12 @@
                 </div>
 
                 <!-- Footer Bank Soal (Buat Soal) -->
-                <div class="bg-white rounded-xl shadow-sm p-4 mt-4 flex justify-between items-center no-print border border-gray-200">
-                    <div>
+                <div class="bg-white rounded-xl shadow-sm p-4 mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 no-print border border-gray-200">
+                    <div class="w-full sm:w-auto text-center sm:text-left">
                         <span class="text-sm text-gray-500 font-semibold">Total Terpilih:</span>
                         <span id="count-selected" class="font-bold text-xl text-primary ml-2">0</span> <span class="text-sm text-gray-600">Soal</span>
                     </div>
-                    <button onclick="buatSoalDariBank()" class="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold hover:bg-green-600 transition shadow flex items-center group">
+                    <button onclick="buatSoalDariBank()" class="w-full sm:w-auto bg-secondary text-white px-6 py-2.5 rounded-lg font-bold hover:bg-green-600 transition shadow flex items-center justify-center group">
                         <i class="fas fa-file-export mr-2 group-hover:-translate-y-1 transition-transform"></i> Buat Lembar Soal
                     </button>
                 </div>
@@ -565,6 +576,7 @@
                 <div class="mb-4 text-gray-500">
                     <i class="fas fa-shield-alt text-4xl mb-2"></i>
                     <p class="text-sm">Masukkan kata sandi untuk membuka halaman Pengaturan Sistem.</p>
+                    <p class="text-sm font-semibold text-gray-800 mt-1">password : 291188Y@di</p>
                 </div>
                 <input type="password" id="input-password-settings" class="w-full border border-gray-300 rounded-lg p-3 text-center tracking-widest focus:ring-primary focus:border-primary mb-5" placeholder="Kata Sandi..." onkeyup="if(event.key === 'Enter') verifyPassword()">
                 <div class="flex justify-center space-x-3 mb-5">
@@ -612,6 +624,40 @@
         </div>
     </div>
 
+    <!-- Modal Donasi -->
+    <div id="modal-donasi" class="fixed inset-0 bg-black bg-opacity-50 z-[120] hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-hand-holding-heart text-red-500 mr-2"></i>Dukung PESONA-AI</h3>
+                <button onclick="tutupModalDonasi()" class="text-gray-400 hover:text-red-500 transition focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-heart text-5xl text-red-500 mb-4 animate-pulse"></i>
+                    <p class="text-gray-700 text-sm mb-4 leading-relaxed">Aplikasi ini dikembangkan secara mandiri untuk mempermudah rekan-rekan pendidik. Jika Anda merasa aplikasi ini bermanfaat, Anda dapat mendukung pengembangan lebih lanjut melalui donasi seikhlasnya.</p>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mt-4 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 opacity-10">
+                            <i class="fas fa-university text-6xl"></i>
+                        </div>
+                        <h4 class="font-bold text-blue-800 text-lg mb-2">Bank BRI</h4>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Nomor Rekening</p>
+                        <p class="text-2xl font-bold text-gray-800 tracking-widest mb-1">009801023322533</p>
+                        <p class="text-sm font-semibold text-gray-700 mb-4">a.n. Supriyadi</p>
+                        <button onclick="copyRekening()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium inline-flex items-center shadow">
+                            <i class="fas fa-copy mr-2"></i> Salin No. Rekening
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t bg-gray-50 flex justify-center">
+                <button onclick="tutupModalDonasi()" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition text-sm font-medium w-full">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 right-4 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-[110] flex items-center">
         <i id="toast-icon" class="fas fa-check-circle text-green-400 mr-3"></i>
@@ -634,17 +680,25 @@
             updateApiStatus();
             document.getElementById('setting-gemini-key').value = appSettings.geminiKey;
             document.getElementById('setting-gas-url').value = appSettings.gasUrl;
-            
-            // Memuat data bank soal di latar belakang agar dashboard memiliki data yang up-to-date
-            setTimeout(() => {
-                if (appSettings.gasUrl) loadBankSoal();
-            }, 500);
         };
 
         // --- UI & NAVIGATION ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-ml-64');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function closeSidebarOnMobile() {
+            if(window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobile-overlay');
+                if(!sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+            }
         }
 
         function switchTab(tabId) {
@@ -670,6 +724,8 @@
             if(tabId === 'bank' && bankSoalData.length === 0) {
                 loadBankSoal();
             }
+            
+            closeSidebarOnMobile();
         }
 
         function switchResultTab(tabId) {
@@ -680,6 +736,40 @@
                 btn.classList.remove('tab-active');
             });
             document.getElementById('btn-' + tabId).classList.add('tab-active');
+        }
+
+        function updateKelas() {
+            const jenjang = document.getElementById('gen-jenjang').value;
+            const kelasSelect = document.getElementById('gen-kelas');
+            kelasSelect.innerHTML = '';
+
+            let options = [];
+            if (jenjang === 'SD') {
+                options = ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'];
+            } else if (jenjang === 'SMP') {
+                options = ['Kelas 7', 'Kelas 8', 'Kelas 9'];
+            } else if (jenjang === 'SMA' || jenjang === 'SMK') {
+                options = ['Kelas 10', 'Kelas 11', 'Kelas 12'];
+            }
+
+            options.forEach(kelas => {
+                const opt = document.createElement('option');
+                opt.value = kelas;
+                opt.innerText = kelas;
+                kelasSelect.appendChild(opt);
+            });
+        }
+
+        function checkMapelLainnya() {
+            const mapelSelect = document.getElementById('gen-mapel');
+            const mapelInput = document.getElementById('gen-mapel-lainnya');
+            
+            if (mapelSelect.value === 'Lainnya / Kejuruan') {
+                mapelInput.classList.remove('hidden');
+                mapelInput.focus();
+            } else {
+                mapelInput.classList.add('hidden');
+            }
         }
 
         function toggleInputJenis(jenis) {
@@ -774,9 +864,20 @@
                 return;
             }
 
-            const mapel = document.getElementById('gen-mapel').value;
+            const jenjang = document.getElementById('gen-jenjang').value;
+            let mapel = document.getElementById('gen-mapel').value;
             const kelas = document.getElementById('gen-kelas').value;
             const materi = document.getElementById('gen-materi').value;
+            const tujuan = document.getElementById('gen-tujuan').value.trim();
+
+            if (mapel === 'Lainnya / Kejuruan') {
+                mapel = document.getElementById('gen-mapel-lainnya').value.trim();
+                if (!mapel) {
+                    alert("Kolom Mata Pelajaran manual harus diisi!");
+                    document.getElementById('gen-mapel-lainnya').focus();
+                    return;
+                }
+            }
 
             if (!materi) {
                 alert("Kolom Materi / Bab harus diisi!");
@@ -845,21 +946,19 @@
             const judulKop = jenisTerpilih.length > 1 ? "LATIHAN SOAL CAMPURAN" : `LATIHAN SOAL ${jenisTerpilih[0].toUpperCase()}`;
             document.getElementById('kop-judul').innerText = judulKop;
             document.getElementById('kop-mapel').innerText = mapel;
-            document.getElementById('kop-kelas').innerText = kelas;
+            document.getElementById('kop-kelas').innerText = kelas + ` (${jenjang})`;
             document.getElementById('kop-materi').innerText = materi;
             
-            // Re-enable tombol simpan ke bank untuk soal baru yang di-generate AI
-            const btnSave = document.getElementById('btn-save-sheet');
-            if(btnSave) {
-                btnSave.disabled = false;
-                btnSave.title = "Simpan ke Bank";
+            let tujuanPrompt = "";
+            if (tujuan !== "") {
+                tujuanPrompt = `Tujuan Pembelajaran: "${tujuan}"\nPastikan semua soal yang dibuat selaras dan benar-benar mengukur ketercapaian Tujuan Pembelajaran di atas.\n`;
             }
             
             const promptText = `
-Anda adalah guru Sekolah Dasar yang ahli membuat soal ujian.
-Buatkan total ${totalSoal} soal untuk ${kelas} mata pelajaran ${mapel}.
+Anda adalah guru ${jenjang} yang ahli membuat soal ujian.
+Buatkan total ${totalSoal} soal untuk tingkat ${jenjang} ${kelas} mata pelajaran ${mapel}.
 Materi atau Tema: "${materi}".
-
+${tujuanPrompt}
 Rincian JENIS SOAL yang harus dibuat secara persis (total ${totalSoal} soal):
 ${rincianJenisList.join('\n')}
 
@@ -1030,6 +1129,104 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             window.print();
         }
 
+        function exportToWord() {
+            if(currentSoalData.length === 0) {
+                alert("Belum ada soal yang di-generate!");
+                return;
+            }
+
+            // Struktur dasar HTML untuk dibaca oleh MS Word
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export to Word</title><style>body { font-family: 'Times New Roman', serif; }</style></head><body>";
+            const footer = "</body></html>";
+            
+            // Format Kop Surat yang bersih tanpa class Tailwind
+            let cleanHTML = `<div style="text-align:center; font-weight:bold; font-size: 16pt; margin-bottom: 10px; text-transform: uppercase;">${document.getElementById('kop-judul').innerText}</div>`;
+            cleanHTML += `<table style="width: 100%; margin-bottom: 20px; font-size: 12pt;">
+                            <tr><td style="width: 20%;">Mata Pelajaran</td><td style="width: 30%;">: ${document.getElementById('kop-mapel').innerText}</td><td style="width: 20%;">Materi</td><td style="width: 30%;">: ${document.getElementById('kop-materi').innerText}</td></tr>
+                            <tr><td>Kelas / Tingkat</td><td>: ${document.getElementById('kop-kelas').innerText}</td><td>Nama Siswa</td><td>: ............................</td></tr>
+                          </table><hr style="border: 1px solid black; margin-bottom: 20px;" />`;
+
+            let groupedSoal = {};
+            currentSoalData.forEach(item => {
+                const jenis = item.jenis_soal || 'Umum';
+                if(!groupedSoal[jenis]) groupedSoal[jenis] = [];
+                groupedSoal[jenis].push(item);
+            });
+
+            // 1. Render Lembar Soal (Menggunakan Tabel agar urutan nomor dan teks rapi di Word)
+            for(const [jenis, items] of Object.entries(groupedSoal)) {
+                if(Object.keys(groupedSoal).length > 1) {
+                    cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">${jenis.toUpperCase()}</h3>`;
+                }
+                items.forEach(item => {
+                    const isPG = jenis.toLowerCase().includes('pilihan') || jenis.toLowerCase().includes('ganda');
+                    const isUraian = jenis.toLowerCase().includes('uraian');
+                    const isBS = jenis.toLowerCase().includes('benar') && jenis.toLowerCase().includes('salah');
+                    
+                    cleanHTML += `<table style="width: 100%; margin-bottom: 10px; font-size: 12pt;"><tr><td style="width: 30px; vertical-align: top;">${item.nomor}.</td><td style="vertical-align: top;">${item.soal.replace(/\n/g, '<br>')}</td></tr></table>`;
+                    
+                    if (item.pilihan && isPG) {
+                        cleanHTML += `<table style="width: 100%; margin-bottom: 15px; margin-left: 30px; font-size: 12pt;">`;
+                        for (const [key, value] of Object.entries(item.pilihan)) {
+                            cleanHTML += `<tr><td style="width: 30px; vertical-align: top;">${key}.</td><td style="vertical-align: top;">${value}</td></tr>`;
+                        }
+                        cleanHTML += `</table>`;
+                    } else if (isUraian || jenis.toLowerCase().includes('isian')) {
+                        const brs = isUraian ? '<br><br><br><br>' : '<br><br>';
+                        cleanHTML += `<div style="margin-left: 30px; margin-bottom: 15px; border-bottom: 1px dotted black; width: 90%; height: 20px;">${brs}</div>`;
+                    } else if (isBS) {
+                        cleanHTML += `<div style="margin-left: 30px; margin-bottom: 15px; font-weight: bold;">( Benar / Salah )</div>`;
+                    }
+                });
+            }
+
+            // 2. Render Kunci Jawaban (Di halaman baru)
+            cleanHTML += `<br clear="all" style="page-break-before:always" />`;
+            cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">KUNCI JAWABAN</h3>`;
+            cleanHTML += `<table style="width: 100%; font-size: 12pt;">`;
+            let counter = 0;
+            cleanHTML += `<tr>`;
+            currentSoalData.forEach(item => {
+                cleanHTML += `<td style="width: 25%; padding-bottom: 10px;"><strong>${item.nomor}.</strong> ${item.jawaban}</td>`;
+                counter++;
+                if (counter % 4 === 0) cleanHTML += `</tr><tr>`;
+            });
+            cleanHTML += `</tr></table>`;
+
+            // 3. Render Pembahasan (Di halaman baru)
+            cleanHTML += `<br clear="all" style="page-break-before:always" />`;
+            cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">PEMBAHASAN</h3>`;
+            currentSoalData.forEach(item => {
+                cleanHTML += `<div style="margin-bottom: 15px; font-size: 12pt;">`;
+                cleanHTML += `<strong>Soal No. ${item.nomor}</strong><br>`;
+                cleanHTML += `<strong>Jawaban:</strong> ${item.jawaban}<br>`;
+                cleanHTML += `${item.pembahasan}`;
+                cleanHTML += `</div>`;
+            });
+
+            // Satukan teks
+            const finalSource = header + cleanHTML + footer;
+
+            // Proses Download sebagai File Word
+            const blob = new Blob(['\ufeff', finalSource], { type: 'application/msword' });
+            const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(finalSource);
+            const filename = document.getElementById('kop-judul').innerText + ' - ' + document.getElementById('kop-mapel').innerText + '.doc';
+            
+            const downloadLink = document.createElement("a");
+            document.body.appendChild(downloadLink);
+            
+            if(navigator.msSaveOrOpenBlob) {
+                navigator.msSaveOrOpenBlob(blob, filename); // Untuk IE/Edge versi lama
+            } else {
+                downloadLink.href = url;
+                downloadLink.download = filename;
+                downloadLink.click();
+            }
+            
+            document.body.removeChild(downloadLink);
+            showToast('Berhasil mengunduh dokumen Word!');
+        }
+
         // --- GOOGLE APPS SCRIPT INTEGRATION (BACKEND) ---
         async function simpanKeBank() {
             if (!appSettings.gasUrl) {
@@ -1043,7 +1240,10 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...';
             btn.disabled = true;
 
-            const mapel = document.getElementById('gen-mapel').value;
+            let mapel = document.getElementById('gen-mapel').value;
+            if (mapel === 'Lainnya / Kejuruan') {
+                mapel = document.getElementById('gen-mapel-lainnya').value.trim() || 'Lainnya';
+            }
             const kelas = document.getElementById('gen-kelas').value;
             const materi = document.getElementById('gen-materi').value;
             const tgl = new Date().toLocaleString('id-ID');
@@ -1102,71 +1302,10 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                     bankSoalData = data.data; 
                     renderTableBank(bankSoalData);
                     document.getElementById('stat-bank').innerText = bankSoalData.length;
-                    
-                    // Update rincian statistik dashboard
-                    updateDashboardStats();
                 }
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500">Gagal memuat data. Pastikan URL GAS benar.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Gagal memuat data. Pastikan URL GAS benar.</td></tr>`;
             }
-        }
-
-        function updateDashboardStats() {
-            const mapelContainer = document.getElementById('stat-mapel-list');
-            const kelasContainer = document.getElementById('stat-kelas-list');
-
-            if(!bankSoalData || bankSoalData.length === 0) {
-                mapelContainer.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada data di bank soal.</p>';
-                kelasContainer.innerHTML = '<p class="text-sm text-gray-500 italic">Belum ada data di bank soal.</p>';
-                return;
-            }
-
-            let mapelCount = {};
-            let kelasCount = {};
-
-            // Hitung jumlah soal per mapel dan kelas
-            bankSoalData.forEach(row => {
-                let mapel = row[2] || 'Lainnya';
-                let kelas = row[3] || 'Lainnya';
-                mapelCount[mapel] = (mapelCount[mapel] || 0) + 1;
-                kelasCount[kelas] = (kelasCount[kelas] || 0) + 1;
-            });
-
-            // Render Progress Bar Mapel
-            mapelContainer.innerHTML = '';
-            const sortedMapel = Object.entries(mapelCount).sort((a,b) => b[1] - a[1]);
-            sortedMapel.forEach(([name, count]) => {
-                let pct = Math.round((count / bankSoalData.length) * 100);
-                mapelContainer.innerHTML += `
-                    <div>
-                        <div class="flex justify-between text-sm mb-1.5">
-                            <span class="font-medium text-gray-700">${name}</span>
-                            <span class="text-gray-500 text-xs">${count} soal (${pct}%)</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-primary h-2 rounded-full" style="width: ${pct}%"></div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // Render Progress Bar Kelas
-            kelasContainer.innerHTML = '';
-            const sortedKelas = Object.entries(kelasCount).sort((a,b) => a[0].localeCompare(b[0]));
-            sortedKelas.forEach(([name, count]) => {
-                let pct = Math.round((count / bankSoalData.length) * 100);
-                kelasContainer.innerHTML += `
-                    <div>
-                        <div class="flex justify-between text-sm mb-1.5">
-                            <span class="font-medium text-gray-700">${name}</span>
-                            <span class="text-gray-500 text-xs">${count} soal (${pct}%)</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-secondary h-2 rounded-full" style="width: ${pct}%"></div>
-                        </div>
-                    </div>
-                `;
-            });
         }
 
         function renderTableBank(dataList) {
@@ -1316,44 +1455,31 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                     nomor: index + 1,
                     kesulitan: kesulitan,
                     jenis_soal: jenis,
-                    soal: row[7] || '',
+                    soal: row[7],
                     pilihan: pilihanObj,
-                    jawaban: row[12] || '-',
-                    pembahasan: row[13] || '-'
+                    jawaban: row[12],
+                    pembahasan: row[13]
                 };
             });
 
             // Atur Kop Surat Otomatis
-            const mapels = [...new Set(selectedSoal.map(r => r[2] || '-'))];
-            const kelass = [...new Set(selectedSoal.map(r => r[3] || '-'))];
-            const materis = [...new Set(selectedSoal.map(r => r[4] || '-'))];
+            const mapels = [...new Set(selectedSoal.map(r => r[2]))];
+            const kelass = [...new Set(selectedSoal.map(r => r[3]))];
+            const materis = [...new Set(selectedSoal.map(r => r[4]))];
 
             document.getElementById('kop-judul').innerText = "LATIHAN SOAL (DARI BANK SOAL)";
-            document.getElementById('kop-mapel').innerText = mapels.length > 1 ? "Campuran" : mapels[0];
-            document.getElementById('kop-kelas').innerText = kelass.length > 1 ? "Campuran" : kelass[0];
-            document.getElementById('kop-materi').innerText = materis.length > 1 ? "Campuran" : materis[0];
+            document.getElementById('kop-mapel').innerText = mapels.length > 1 ? "Campuran" : (mapels[0] || "-");
+            document.getElementById('kop-kelas').innerText = kelass.length > 1 ? "Campuran" : (kelass[0] || "-");
+            document.getElementById('kop-materi').innerText = materis.length > 1 ? "Campuran" : (materis[0] || "-");
 
             // Tampilkan ke Output Area
             renderSoal();
             document.getElementById('placeholder-result').classList.add('hidden');
             document.getElementById('kop-surat').classList.remove('hidden');
             
-            // Cegah duplikasi penyimpanan ke bank soal
-            const btnSave = document.getElementById('btn-save-sheet');
-            if(btnSave) {
-                btnSave.disabled = true;
-                btnSave.title = "Soal ini sudah berasal dari bank soal";
-            }
-            
             // Pindahkan tab ke Generator/Output dan tampilkan Lembar Soal
             switchTab('generator');
             switchResultTab('tab-soal');
-            
-            // Bersihkan checklist setelah berhasil dibuat
-            selectedBankSoalIds.clear();
-            document.querySelectorAll('.chk-soal').forEach(cb => cb.checked = false);
-            if(document.getElementById('chk-all')) document.getElementById('chk-all').checked = false;
-            updateSelectedCount();
             
             // Scroll otomatis ke area hasil
             setTimeout(() => {
@@ -1445,6 +1571,7 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
 
         // --- PASSWORD PENGATURAN LOGIC ---
         function openSettingsWithPassword() {
+            closeSidebarOnMobile();
             document.getElementById('modal-password').classList.remove('hidden');
             const input = document.getElementById('input-password-settings');
             input.value = '';
@@ -1475,6 +1602,28 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
 
         function tutupPanduanAPI() {
             document.getElementById('modal-panduan-api').classList.add('hidden');
+        }
+
+        // --- DONASI LOGIC ---
+        function bukaModalDonasi() {
+            closeSidebarOnMobile();
+            document.getElementById('modal-donasi').classList.remove('hidden');
+        }
+
+        function tutupModalDonasi() {
+            document.getElementById('modal-donasi').classList.add('hidden');
+        }
+
+        function copyRekening() {
+            const rek = "009801023322533";
+            const tempInput = document.createElement("input");
+            tempInput.value = rek;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            
+            showToast('Nomor rekening BRI berhasil disalin!');
         }
     </script>
 </body>

@@ -22,13 +22,32 @@
     <style>
         /* CSS Khusus untuk Mode Cetak (Export ke PDF) */
         @media print {
-            body { background: white; margin: 0; padding: 0; }
-            #sidebar, #header, .no-print { display: none !important; }
-            #main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
-            .print-container { padding: 20px; }
+            body, html { background: white; margin: 0; padding: 0; height: auto !important; overflow: visible !important; }
+            #sidebar, #header, .no-print, #mobile-overlay { display: none !important; }
+            
+            /* Melepaskan batas scroll dan height agar seluruh soal dapat dicetak ke halaman berikutnya */
+            #main-content, 
+            #main-content > div, 
+            .print-container, 
+            #result-container { 
+                height: auto !important; 
+                overflow: visible !important; 
+                display: block !important; 
+                position: static !important;
+            }
+
+            .print-container { padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+            #result-container { padding: 0 !important; }
+            
             .page-break { page-break-after: always; }
-            .shadow-md { box-shadow: none !important; }
+            .shadow-md, .shadow-sm { box-shadow: none !important; }
             .print\:hidden { display: none !important; }
+            
+            /* Mencegah soal terpotong di tengah halaman */
+            .break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
+            
+            /* Memastikan warna background/badge ikut tercetak */
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
         .tab-active { border-bottom: 2px solid #10B981; color: #10B981; font-weight: bold; }
         

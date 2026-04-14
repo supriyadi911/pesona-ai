@@ -48,6 +48,11 @@
             
             /* Memastikan warna background/badge ikut tercetak */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            
+            /* Memaksa SEMUA tab (Soal, Kunci, Bahas, Kisi-kisi) untuk tampil saat dicetak */
+            .result-tab { display: block !important; }
+            #tab-kunci, #tab-bahas, #tab-kisi { break-before: page; page-break-before: always; padding-top: 20px; }
+            #placeholder-result.hidden { display: none !important; }
         }
         .tab-active { border-bottom: 2px solid #10B981; color: #10B981; font-weight: bold; }
         
@@ -312,6 +317,37 @@
 
                         </div>
 
+                        <!-- TINGKAT KOGNITIF -->
+                        <div class="mt-5">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tingkat Kognitif yang Diizinkan (C1 - C6)</label>
+                            <div class="flex flex-wrap gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" value="C1" class="chk-kognitif w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" checked>
+                                    <span class="ml-2 text-xs font-medium text-gray-700">C1 (Mengingat)</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" value="C2" class="chk-kognitif w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" checked>
+                                    <span class="ml-2 text-xs font-medium text-gray-700">C2 (Memahami)</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" value="C3" class="chk-kognitif w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" checked>
+                                    <span class="ml-2 text-xs font-medium text-gray-700">C3 (Mengaplikasi)</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" value="C4" class="chk-kognitif w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary">
+                                    <span class="ml-2 text-xs font-medium text-gray-700">C4 (Menganalisis)</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" value="C5" class="chk-kognitif w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary">
+                                    <span class="ml-2 text-xs font-medium text-gray-700">C5 (Mengevaluasi)</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" value="C6" class="chk-kognitif w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary">
+                                    <span class="ml-2 text-xs font-medium text-gray-700">C6 (Mencipta)</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end mt-6">
                             <button onclick="generateSoalAI()" class="bg-secondary hover:bg-green-600 text-white font-bold py-2.5 px-8 rounded-lg shadow transition flex justify-center items-center group">
                                 <i class="fas fa-magic mr-2 group-hover:animate-pulse"></i> Generate Soal AI
@@ -328,6 +364,7 @@
                                 <button onclick="switchResultTab('tab-soal')" id="btn-tab-soal" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 tab-active transition-colors whitespace-nowrap text-sm sm:text-base">Lembar Soal</button>
                                 <button onclick="switchResultTab('tab-kunci')" id="btn-tab-kunci" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap text-sm sm:text-base">Kunci Jawaban</button>
                                 <button onclick="switchResultTab('tab-bahas')" id="btn-tab-bahas" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap text-sm sm:text-base">Pembahasan</button>
+                                <button onclick="switchResultTab('tab-kisi')" id="btn-tab-kisi" class="px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap text-sm sm:text-base">Kisi-kisi</button>
                             </div>
                             <div class="flex flex-wrap gap-2 mt-2 lg:mt-0 w-full lg:w-auto justify-start lg:justify-end">
                                 <button onclick="acakSoal()" class="px-3 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm flex items-center transition" title="Acak urutan soal">
@@ -382,6 +419,25 @@
                             <div id="tab-bahas" class="result-tab hidden">
                                 <h3 class="text-xl font-bold mb-4 print:mt-10">PEMBAHASAN</h3>
                                 <div id="content-bahas" class="space-y-4 text-gray-800"></div>
+                            </div>
+
+                            <!-- 4. Kisi-Kisi Soal -->
+                            <div id="tab-kisi" class="result-tab hidden">
+                                <h3 class="text-xl font-bold mb-4 print:mt-10 uppercase">KISI-KISI PENULISAN SOAL</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-left border-collapse border border-gray-300">
+                                        <thead class="bg-gray-100 text-gray-700">
+                                            <tr>
+                                                <th class="border border-gray-300 p-2 text-center w-10">No</th>
+                                                <th class="border border-gray-300 p-2">Materi</th>
+                                                <th class="border border-gray-300 p-2">Indikator Soal</th>
+                                                <th class="border border-gray-300 p-2 text-center">Bentuk Soal</th>
+                                                <th class="border border-gray-300 p-2 text-center w-24">Level Kognitif</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="content-kisi" class="text-gray-800"></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -945,6 +1001,13 @@
                 return;
             }
 
+            // --- AMBIL DATA TINGKAT KOGNITIF ---
+            const selectedKognitif = Array.from(document.querySelectorAll('.chk-kognitif:checked')).map(cb => cb.value);
+            if (selectedKognitif.length === 0) {
+                alert("Centang minimal satu Tingkat Kognitif (C1-C6)!");
+                return;
+            }
+
             // --- VALIDASI TOTAL JUMLAH SOAL ---
             if (totalJenis !== totalKesulitan) {
                 alert(`Terdapat ketidaksesuaian jumlah soal:\n\nTotal pada Jenis Soal = ${totalJenis} soal.\nTotal pada Tingkat Kesulitan = ${totalKesulitan} soal.\n\nKedua total ini HARUS SAMA. Silakan sesuaikan angka jumlah soalnya.`);
@@ -978,6 +1041,8 @@ Anda adalah guru ${jenjang} yang ahli membuat soal ujian.
 Buatkan total ${totalSoal} soal untuk tingkat ${jenjang} ${kelas} mata pelajaran ${mapel}.
 Materi atau Tema: "${materi}".
 ${tujuanPrompt}
+Syarat Tingkat Kognitif: Soal yang dibuat HANYA BOLEH mencakup level kognitif berikut: ${selectedKognitif.join(', ')}. Distribusikan secara proporsional.
+
 Rincian JENIS SOAL yang harus dibuat secara persis (total ${totalSoal} soal):
 ${rincianJenisList.join('\n')}
 
@@ -993,7 +1058,9 @@ Syarat Output HARUS berupa valid JSON Array of Objects murni tanpa text markdown
     "soal": "Tuliskan pertanyaan soal disini...",
     "pilihan": {"A": "opsi 1", "B": "opsi 2", "C": "opsi 3", "D": "opsi 4"}, // WAJIB ADA jika jenis_soalnya Pilihan Ganda. Jika jenis soal yang lain, isi dengan null.
     "jawaban": "A/B/C/D atau Kunci jawaban singkat/benar-salah/uraian",
-    "pembahasan": "Penjelasan detail mengapa jawaban tersebut benar."
+    "pembahasan": "Penjelasan detail mengapa jawaban tersebut benar.",
+    "tingkat_kognitif": "Level kognitif soal (HANYA ISI DENGAN SALAH SATU DARI: ${selectedKognitif.join('/')})",
+    "indikator_soal": "Deskripsi singkat indikator pencapaian kompetensi untuk soal ini"
   }
 ]
 Penting: Output HANYA boleh berisi kurung siku [...] JSON.
@@ -1009,16 +1076,24 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                             temperature: 0.7,
                             topK: 40,
                             topP: 0.95,
+                            responseMimeType: "application/json"
                         }
                     })
                 });
 
-                if (!response.ok) throw new Error("Gagal menghubungi API Gemini");
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message || "Gagal menghubungi API Gemini");
+                }
                 
                 const data = await response.json();
                 let rawText = data.candidates[0].content.parts[0].text;
                 
-                rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                // Ekstraksi JSON secara paksa untuk menghindari error teks tambahan (markdown) dari AI
+                const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+                if (jsonMatch) {
+                    rawText = jsonMatch[0];
+                }
                 
                 currentSoalData = JSON.parse(rawText);
                 
@@ -1046,10 +1121,12 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             const containerSoal = document.getElementById('content-soal');
             const containerKunci = document.getElementById('content-kunci');
             const containerBahas = document.getElementById('content-bahas');
+            const containerKisi = document.getElementById('content-kisi');
             
             containerSoal.innerHTML = '';
             containerKunci.innerHTML = '';
             containerBahas.innerHTML = '';
+            if(containerKisi) containerKisi.innerHTML = '';
 
             let groupedSoal = {};
             currentSoalData.forEach(item => {
@@ -1119,10 +1196,25 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                             Soal No. ${item.nomor} 
                             <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full ml-2 print:hidden font-normal border border-blue-200">${jenis}</span>
                             <span class="text-[10px] ${badgeColor} px-2 py-0.5 rounded-full ml-1 print:hidden font-normal">${item.kesulitan || 'Umum'}</span>
+                            <span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full ml-1 print:hidden font-semibold border border-purple-200">${item.tingkat_kognitif || 'C-'}</span>
                         </p>
                         <p class="text-gray-700"><strong>Jawaban:</strong> ${item.jawaban}</p>
                         <p class="text-gray-600 mt-1">${item.pembahasan}</p>
                     </div>`;
+
+                    // 4. Render Kisi-kisi
+                    if(containerKisi) {
+                        const materiTeks = document.getElementById('gen-materi').value || '-';
+                        containerKisi.innerHTML += `
+                            <tr class="hover:bg-gray-50 break-inside-avoid">
+                                <td class="border border-gray-300 p-2 text-center">${item.nomor}</td>
+                                <td class="border border-gray-300 p-2">${materiTeks}</td>
+                                <td class="border border-gray-300 p-2">${item.indikator_soal || '-'}</td>
+                                <td class="border border-gray-300 p-2 text-center">${jenis}</td>
+                                <td class="border border-gray-300 p-2 text-center font-semibold text-purple-700">${item.tingkat_kognitif || '-'}</td>
+                            </tr>
+                        `;
+                    }
                 });
             }
         }
@@ -1217,11 +1309,27 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">PEMBAHASAN</h3>`;
             currentSoalData.forEach(item => {
                 cleanHTML += `<div style="margin-bottom: 15px; font-size: 12pt;">`;
-                cleanHTML += `<strong>Soal No. ${item.nomor}</strong><br>`;
+                cleanHTML += `<strong>Soal No. ${item.nomor}</strong> (Tingkat Kognitif: ${item.tingkat_kognitif || '-'})<br>`;
                 cleanHTML += `<strong>Jawaban:</strong> ${item.jawaban}<br>`;
                 cleanHTML += `${item.pembahasan}`;
                 cleanHTML += `</div>`;
             });
+
+            // 4. Render Kisi-kisi (Di halaman baru)
+            cleanHTML += `<br clear="all" style="page-break-before:always" />`;
+            cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; text-align: center;">KISI-KISI PENULISAN SOAL</h3>`;
+            cleanHTML += `<table style="width: 100%; font-size: 11pt; border-collapse: collapse; margin-top: 10px;" border="1">`;
+            cleanHTML += `<tr><th style="padding: 8px;">No</th><th style="padding: 8px;">Materi</th><th style="padding: 8px;">Indikator Soal</th><th style="padding: 8px;">Bentuk Soal</th><th style="padding: 8px;">Level Kognitif</th></tr>`;
+            currentSoalData.forEach(item => {
+                cleanHTML += `<tr>`;
+                cleanHTML += `<td style="padding: 8px; text-align: center;">${item.nomor}</td>`;
+                cleanHTML += `<td style="padding: 8px;">${document.getElementById('gen-materi').value}</td>`;
+                cleanHTML += `<td style="padding: 8px;">${item.indikator_soal || '-'}</td>`;
+                cleanHTML += `<td style="padding: 8px; text-align: center;">${item.jenis_soal || '-'}</td>`;
+                cleanHTML += `<td style="padding: 8px; text-align: center; font-weight: bold;">${item.tingkat_kognitif || '-'}</td>`;
+                cleanHTML += `</tr>`;
+            });
+            cleanHTML += `</table>`;
 
             // Satukan teks
             const finalSource = header + cleanHTML + footer;

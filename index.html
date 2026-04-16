@@ -53,6 +53,7 @@
             .result-tab { display: block !important; }
             #tab-kunci, #tab-bahas, #tab-kisi { break-before: page; page-break-before: always; padding-top: 20px; }
             #placeholder-result.hidden { display: none !important; }
+            .no-print-tab { display: none !important; } /* Menyembunyikan tab jika opsi tidak dicentang */
         }
         .tab-active { border-bottom: 2px solid #10B981; color: #10B981; font-weight: bold; }
         
@@ -344,6 +345,25 @@
                                 <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
                                     <input type="checkbox" value="C6" class="chk-kognitif w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary">
                                     <span class="ml-2 text-xs font-medium text-gray-700">C6 (Mencipta)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- OPSI KELENGKAPAN SOAL -->
+                        <div class="mt-5">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Opsi Kelengkapan Soal (Dibuat oleh AI)</label>
+                            <div class="flex flex-wrap gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" id="chk-opt-kunci" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" checked>
+                                    <span class="ml-2 text-xs font-medium text-gray-700">Kunci Jawaban</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" id="chk-opt-bahas" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" checked>
+                                    <span class="ml-2 text-xs font-medium text-gray-700">Pembahasan</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer bg-white px-3 py-2 rounded border border-gray-200 shadow-sm hover:bg-blue-50 transition flex-1 min-w-[140px]">
+                                    <input type="checkbox" id="chk-opt-kisi" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" checked>
+                                    <span class="ml-2 text-xs font-medium text-gray-700">Kisi-kisi</span>
                                 </label>
                             </div>
                         </div>
@@ -743,6 +763,7 @@
     <script>
         // --- GLOBAL VARIABLES ---
         let currentSoalData = [];
+        let currentOptions = { kunci: true, bahas: true, kisi: true };
         let appSettings = {
             geminiKey: localStorage.getItem('sd_gemini_key') || '',
             gasUrl: localStorage.getItem('sd_gas_url') || 'https://script.google.com/macros/s/AKfycbzV5ANNawAX1B51bnQ9BI8doJEjmqQvGnldRcfLNJqiJlfTwDe2wdV4RL3_KC2Nmd_FHA/exec'
@@ -1008,6 +1029,13 @@
                 return;
             }
 
+            // --- AMBIL DATA OPSI KELENGKAPAN ---
+            const withKunci = document.getElementById('chk-opt-kunci').checked;
+            const withBahas = document.getElementById('chk-opt-bahas').checked;
+            const withKisi = document.getElementById('chk-opt-kisi').checked;
+            
+            currentOptions = { kunci: withKunci, bahas: withBahas, kisi: withKisi };
+
             // --- VALIDASI TOTAL JUMLAH SOAL ---
             if (totalJenis !== totalKesulitan) {
                 alert(`Terdapat ketidaksesuaian jumlah soal:\n\nTotal pada Jenis Soal = ${totalJenis} soal.\nTotal pada Tingkat Kesulitan = ${totalKesulitan} soal.\n\nKedua total ini HARUS SAMA. Silakan sesuaikan angka jumlah soalnya.`);
@@ -1057,10 +1085,10 @@ Syarat Output HARUS berupa valid JSON Array of Objects murni tanpa text markdown
     "jenis_soal": "Isi dengan salah satu dari: ${jenisTerpilih.join(' / ')}",
     "soal": "Tuliskan pertanyaan soal disini...",
     "pilihan": {"A": "opsi 1", "B": "opsi 2", "C": "opsi 3", "D": "opsi 4"}, // WAJIB ADA jika jenis_soalnya Pilihan Ganda. Jika jenis soal yang lain, isi dengan null.
-    "jawaban": "A/B/C/D atau Kunci jawaban singkat/benar-salah/uraian",
-    "pembahasan": "Penjelasan detail mengapa jawaban tersebut benar.",
-    "tingkat_kognitif": "Level kognitif soal (HANYA ISI DENGAN SALAH SATU DARI: ${selectedKognitif.join('/')})",
-    "indikator_soal": "Deskripsi singkat indikator pencapaian kompetensi untuk soal ini"
+    "jawaban": ${withKunci ? '"A/B/C/D atau Kunci jawaban singkat/benar-salah/uraian"' : '""'},
+    "pembahasan": ${withBahas ? '"Penjelasan detail mengapa jawaban tersebut benar."' : '""'},
+    "tingkat_kognitif": ${withKisi ? `"Level kognitif soal (HANYA ISI DENGAN SALAH SATU DARI: ${selectedKognitif.join('/')})"` : '""'},
+    "indikator_soal": ${withKisi ? '"Deskripsi singkat indikator pencapaian kompetensi untuk soal ini"' : '""'}
   }
 ]
 Penting: Output HANYA boleh berisi kurung siku [...] JSON.
@@ -1097,6 +1125,16 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                 
                 currentSoalData = JSON.parse(rawText);
                 
+                // Menampilkan/Menyembunyikan Tombol Tab Sesuai Pilihan
+                document.getElementById('btn-tab-kunci').classList.toggle('hidden', !withKunci);
+                document.getElementById('btn-tab-bahas').classList.toggle('hidden', !withBahas);
+                document.getElementById('btn-tab-kisi').classList.toggle('hidden', !withKisi);
+                
+                // Menambahkan penanda pada container untuk logic print PDF
+                document.getElementById('tab-kunci').classList.toggle('no-print-tab', !withKunci);
+                document.getElementById('tab-bahas').classList.toggle('no-print-tab', !withBahas);
+                document.getElementById('tab-kisi').classList.toggle('no-print-tab', !withKisi);
+
                 renderSoal();
                 document.getElementById('kop-surat').classList.remove('hidden');
                 switchResultTab('tab-soal');
@@ -1292,44 +1330,50 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             }
 
             // 2. Render Kunci Jawaban (Di halaman baru)
-            cleanHTML += `<br clear="all" style="page-break-before:always" />`;
-            cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">KUNCI JAWABAN</h3>`;
-            cleanHTML += `<table style="width: 100%; font-size: 12pt;">`;
-            let counter = 0;
-            cleanHTML += `<tr>`;
-            currentSoalData.forEach(item => {
-                cleanHTML += `<td style="width: 25%; padding-bottom: 10px;"><strong>${item.nomor}.</strong> ${item.jawaban}</td>`;
-                counter++;
-                if (counter % 4 === 0) cleanHTML += `</tr><tr>`;
-            });
-            cleanHTML += `</tr></table>`;
+            if(currentOptions.kunci) {
+                cleanHTML += `<br clear="all" style="page-break-before:always" />`;
+                cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">KUNCI JAWABAN</h3>`;
+                cleanHTML += `<table style="width: 100%; font-size: 12pt;">`;
+                let counter = 0;
+                cleanHTML += `<tr>`;
+                currentSoalData.forEach(item => {
+                    cleanHTML += `<td style="width: 25%; padding-bottom: 10px;"><strong>${item.nomor}.</strong> ${item.jawaban || '-'}</td>`;
+                    counter++;
+                    if (counter % 4 === 0) cleanHTML += `</tr><tr>`;
+                });
+                cleanHTML += `</tr></table>`;
+            }
 
             // 3. Render Pembahasan (Di halaman baru)
-            cleanHTML += `<br clear="all" style="page-break-before:always" />`;
-            cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">PEMBAHASAN</h3>`;
-            currentSoalData.forEach(item => {
-                cleanHTML += `<div style="margin-bottom: 15px; font-size: 12pt;">`;
-                cleanHTML += `<strong>Soal No. ${item.nomor}</strong> (Tingkat Kognitif: ${item.tingkat_kognitif || '-'})<br>`;
-                cleanHTML += `<strong>Jawaban:</strong> ${item.jawaban}<br>`;
-                cleanHTML += `${item.pembahasan}`;
-                cleanHTML += `</div>`;
-            });
+            if(currentOptions.bahas) {
+                cleanHTML += `<br clear="all" style="page-break-before:always" />`;
+                cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px;">PEMBAHASAN</h3>`;
+                currentSoalData.forEach(item => {
+                    cleanHTML += `<div style="margin-bottom: 15px; font-size: 12pt;">`;
+                    cleanHTML += `<strong>Soal No. ${item.nomor}</strong> ${currentOptions.kisi ? `(Tingkat Kognitif: ${item.tingkat_kognitif || '-'})` : ''}<br>`;
+                    cleanHTML += `<strong>Jawaban:</strong> ${item.jawaban || '-'}<br>`;
+                    cleanHTML += `${item.pembahasan || '-'}`;
+                    cleanHTML += `</div>`;
+                });
+            }
 
             // 4. Render Kisi-kisi (Di halaman baru)
-            cleanHTML += `<br clear="all" style="page-break-before:always" />`;
-            cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; text-align: center;">KISI-KISI PENULISAN SOAL</h3>`;
-            cleanHTML += `<table style="width: 100%; font-size: 11pt; border-collapse: collapse; margin-top: 10px;" border="1">`;
-            cleanHTML += `<tr><th style="padding: 8px;">No</th><th style="padding: 8px;">Materi</th><th style="padding: 8px;">Indikator Soal</th><th style="padding: 8px;">Bentuk Soal</th><th style="padding: 8px;">Level Kognitif</th></tr>`;
-            currentSoalData.forEach(item => {
-                cleanHTML += `<tr>`;
-                cleanHTML += `<td style="padding: 8px; text-align: center;">${item.nomor}</td>`;
-                cleanHTML += `<td style="padding: 8px;">${document.getElementById('gen-materi').value}</td>`;
-                cleanHTML += `<td style="padding: 8px;">${item.indikator_soal || '-'}</td>`;
-                cleanHTML += `<td style="padding: 8px; text-align: center;">${item.jenis_soal || '-'}</td>`;
-                cleanHTML += `<td style="padding: 8px; text-align: center; font-weight: bold;">${item.tingkat_kognitif || '-'}</td>`;
-                cleanHTML += `</tr>`;
-            });
-            cleanHTML += `</table>`;
+            if(currentOptions.kisi) {
+                cleanHTML += `<br clear="all" style="page-break-before:always" />`;
+                cleanHTML += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; text-align: center;">KISI-KISI PENULISAN SOAL</h3>`;
+                cleanHTML += `<table style="width: 100%; font-size: 11pt; border-collapse: collapse; margin-top: 10px;" border="1">`;
+                cleanHTML += `<tr><th style="padding: 8px;">No</th><th style="padding: 8px;">Materi</th><th style="padding: 8px;">Indikator Soal</th><th style="padding: 8px;">Bentuk Soal</th><th style="padding: 8px;">Level Kognitif</th></tr>`;
+                currentSoalData.forEach(item => {
+                    cleanHTML += `<tr>`;
+                    cleanHTML += `<td style="padding: 8px; text-align: center;">${item.nomor}</td>`;
+                    cleanHTML += `<td style="padding: 8px;">${document.getElementById('gen-materi').value}</td>`;
+                    cleanHTML += `<td style="padding: 8px;">${item.indikator_soal || '-'}</td>`;
+                    cleanHTML += `<td style="padding: 8px; text-align: center;">${item.jenis_soal || '-'}</td>`;
+                    cleanHTML += `<td style="padding: 8px; text-align: center; font-weight: bold;">${item.tingkat_kognitif || '-'}</td>`;
+                    cleanHTML += `</tr>`;
+                });
+                cleanHTML += `</table>`;
+            }
 
             // Satukan teks
             const finalSource = header + cleanHTML + footer;

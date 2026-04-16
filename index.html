@@ -136,23 +136,33 @@
 
             <!-- Dashboard Section -->
             <section id="dashboard" class="page-section">
+                
+                <!-- Kartu Selamat Datang -->
+                <div class="bg-white rounded-xl shadow-sm p-8 text-center border border-gray-100 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang di PESONA-AI</h2>
+                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">Asisten cerdas Anda untuk membuat soal latihan, ulangan harian, dan evaluasi bagi siswa dengan cepat dan mudah menggunakan bantuan Artificial Intelligence.</p>
+                    <button onclick="switchTab('generator')" class="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
+                        <i class="fas fa-plus mr-2"></i> Mulai Buat Soal
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-primary">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-500 mb-1">Total Soal Dibuat</p>
+                                <p class="text-sm text-gray-500 mb-1">Soal Dibuat (Sesi Ini)</p>
                                 <h3 class="text-3xl font-bold text-gray-800" id="stat-total">0</h3>
                             </div>
                             <div class="bg-blue-100 p-3 rounded-full text-primary">
-                                <i class="fas fa-file-alt text-xl"></i>
+                                <i class="fas fa-magic text-xl"></i>
                             </div>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-secondary">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-500 mb-1">Mata Pelajaran Aktif</p>
-                                <h3 class="text-3xl font-bold text-gray-800">8</h3>
+                                <p class="text-sm text-gray-500 mb-1">Mata Pelajaran (Di Bank)</p>
+                                <h3 class="text-3xl font-bold text-gray-800" id="stat-mapel-aktif">0</h3>
                             </div>
                             <div class="bg-green-100 p-3 rounded-full text-secondary">
                                 <i class="fas fa-book text-xl"></i>
@@ -166,18 +176,22 @@
                                 <h3 class="text-3xl font-bold text-gray-800" id="stat-bank">0</h3>
                             </div>
                             <div class="bg-yellow-100 p-3 rounded-full text-yellow-600">
-                                <i class="fas fa-save text-xl"></i>
+                                <i class="fas fa-database text-xl"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="bg-white rounded-xl shadow-sm p-8 text-center">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang di PESONA-AI</h2>
-                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">Asisten cerdas Anda untuk membuat soal latihan, ulangan harian, dan evaluasi bagi siswa dengan cepat dan mudah menggunakan bantuan Artificial Intelligence.</p>
-                    <button onclick="switchTab('generator')" class="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
-                        <i class="fas fa-plus mr-2"></i> Mulai Buat Soal
-                    </button>
+
+                <!-- Rincian Jumlah Soal Per Mata Pelajaran -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-3 flex items-center">
+                        <i class="fas fa-chart-pie text-primary mr-2"></i> Rincian Soal per Mata Pelajaran (Bank Soal)
+                    </h3>
+                    <div id="dashboard-rincian-mapel" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div class="text-center text-gray-500 py-6 col-span-full italic">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Memuat rincian data...
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -469,7 +483,7 @@
                 <div class="bg-white rounded-xl shadow-sm p-4 mb-4 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center no-print w-full">
                     <div class="flex flex-col sm:flex-row flex-wrap gap-3 w-full md:w-auto">
                         <!-- Dropdown Filter Mata Pelajaran (Disamakan dengan Generator) -->
-                        <select id="filter-mapel" onchange="filterBankSoal()" class="w-full sm:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
+                        <select id="filter-mapel" onchange="onMapelChange()" class="w-full sm:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50">
                             <option value="">Semua Mata Pelajaran</option>
                             <option value="Matematika">Matematika</option>
                             <option value="Bahasa Indonesia">Bahasa Indonesia</option>
@@ -496,6 +510,11 @@
                             <option value="Kelas 10">Kelas 10</option>
                             <option value="Kelas 11">Kelas 11</option>
                             <option value="Kelas 12">Kelas 12</option>
+                        </select>
+
+                        <!-- Dropdown Filter Materi (Dinamis dari Spreadsheet) -->
+                        <select id="filter-materi" onchange="filterBankSoal()" class="w-full md:w-auto p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm bg-gray-50 max-w-full sm:max-w-[200px] truncate" title="Pilih Materi">
+                            <option value="">Semua Materi</option>
                         </select>
 
                         <!-- Input Pencarian -->
@@ -776,6 +795,9 @@
             updateApiStatus();
             document.getElementById('setting-gemini-key').value = appSettings.geminiKey;
             document.getElementById('setting-gas-url').value = appSettings.gasUrl;
+            
+            // Otomatis memuat data dari Bank Soal (Spreadsheet) ketika aplikasi dibuka pertama kali
+            loadBankSoal();
         };
 
         // --- UI & NAVIGATION ---
@@ -817,6 +839,7 @@
                 }
             });
 
+            // Bagian ini sekarang hanya reload manual jika data benar-benar kosong
             if(tabId === 'bank' && bankSoalData.length === 0) {
                 loadBankSoal();
             }
@@ -1446,8 +1469,8 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                 });
                 
                 showToast("Berhasil disimpan ke Spreadsheet!");
-                const statBank = document.getElementById('stat-bank');
-                statBank.innerText = parseInt(statBank.innerText) + currentSoalData.length;
+                // Panggil loadBankSoal agar rincian di dashboard ikut diperbarui
+                loadBankSoal(); 
 
             } catch (error) {
                 console.error(error);
@@ -1459,7 +1482,10 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
         }
 
         async function loadBankSoal() {
-            if (!appSettings.gasUrl) return;
+            if (!appSettings.gasUrl) {
+                document.getElementById('dashboard-rincian-mapel').innerHTML = '<div class="text-center text-red-500 py-6 col-span-full">URL Google Apps Script belum diatur.</div>';
+                return;
+            }
 
             const tbody = document.getElementById('table-bank-body');
             tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-primary"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data...</td></tr>';
@@ -1472,11 +1498,52 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
                     // Simpan mapping index data dari GAS (Asumsi struktur: ID, Tgl, Mapel, Kelas, Materi, Jenis, Nomor, Soal, A, B, C, D, Kunci, Bahas)
                     bankSoalData = data.data; 
                     renderTableBank(bankSoalData);
-                    document.getElementById('stat-bank').innerText = bankSoalData.length;
+                    
+                    // Panggil fungsi untuk memperbarui dashboard
+                    updateDashboardStats();
+                    
+                    updateFilterMateriOptions(); // Perbarui pilihan dropdown materi
                 }
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Gagal memuat data. Pastikan URL GAS benar.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500">Gagal memuat data. Pastikan URL GAS benar.</td></tr>`;
+                document.getElementById('dashboard-rincian-mapel').innerHTML = '<div class="text-center text-red-500 py-6 col-span-full">Gagal memuat rincian data dari server.</div>';
             }
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stat-bank').innerText = bankSoalData.length;
+            
+            // Hitung jumlah soal per mata pelajaran
+            const mapelCounts = {};
+            bankSoalData.forEach(row => {
+                const mapel = String(row[2] || 'Lainnya').trim();
+                mapelCounts[mapel] = (mapelCounts[mapel] || 0) + 1;
+            });
+
+            // Update statistik Mapel Aktif
+            const uniqueMapelCount = Object.keys(mapelCounts).length;
+            document.getElementById('stat-mapel-aktif').innerText = uniqueMapelCount;
+
+            // Render Rincian Mata Pelajaran ke Dashboard
+            const rincianContainer = document.getElementById('dashboard-rincian-mapel');
+            rincianContainer.innerHTML = '';
+
+            if (uniqueMapelCount === 0) {
+                rincianContainer.innerHTML = '<div class="text-center text-gray-500 py-6 col-span-full italic">Belum ada data tersimpan di Bank Soal.</div>';
+                return;
+            }
+
+            // Urutkan dari jumlah soal terbanyak
+            const sortedMapel = Object.entries(mapelCounts).sort((a, b) => b[1] - a[1]);
+
+            sortedMapel.forEach(([mapel, count]) => {
+                rincianContainer.innerHTML += `
+                    <div class="flex justify-between items-center p-3.5 bg-blue-50/50 rounded-lg border border-blue-100 hover:bg-blue-100 transition shadow-sm">
+                        <span class="font-medium text-gray-700 truncate pr-3" title="${mapel}">${mapel}</span>
+                        <span class="bg-primary text-white text-xs font-bold px-2.5 py-1.5 rounded-full whitespace-nowrap shadow-sm">${count} Soal</span>
+                    </div>
+                `;
+            });
         }
 
         function renderTableBank(dataList) {
@@ -1520,9 +1587,50 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
             updateSelectedCount(); // Perbarui perhitungan total terpilih tiap render
         }
 
+        function onMapelChange() {
+            updateFilterMateriOptions();
+            filterBankSoal();
+        }
+
+        function updateFilterMateriOptions() {
+            const mapelFilter = document.getElementById('filter-mapel').value.toLowerCase();
+            const materiSelect = document.getElementById('filter-materi');
+            const currentSelectedMateri = materiSelect.value;
+            
+            materiSelect.innerHTML = '<option value="">Semua Materi</option>';
+            
+            // Filter baris berdasarkan mapel (jika ada yang dipilih)
+            let filteredRows = bankSoalData;
+            if (mapelFilter !== '') {
+                filteredRows = bankSoalData.filter(row => String(row[2]).toLowerCase() === mapelFilter);
+            }
+            
+            // Ambil daftar materi unik dari data yang sudah difilter
+            const uniqueMateri = [...new Set(filteredRows.map(row => String(row[4] || '').trim()))]
+                .filter(m => m !== '')
+                .sort();
+            
+            uniqueMateri.forEach(materi => {
+                const opt = document.createElement('option');
+                opt.value = materi;
+                // Potong teks jika terlalu panjang agar tidak merusak tampilan dropdown
+                opt.innerText = materi.length > 35 ? materi.substring(0, 35) + '...' : materi;
+                opt.title = materi; // Tampilkan teks penuh saat cursor di-hover
+                materiSelect.appendChild(opt);
+            });
+
+            // Kembalikan pilihan materi sebelumnya jika masih tersedia di mapel ini
+            if (uniqueMateri.includes(currentSelectedMateri)) {
+                materiSelect.value = currentSelectedMateri;
+            } else {
+                materiSelect.value = '';
+            }
+        }
+
         function filterBankSoal() {
             const mapel = document.getElementById('filter-mapel').value.toLowerCase();
             const kelas = document.getElementById('filter-kelas').value.toLowerCase();
+            const materiFilter = document.getElementById('filter-materi').value.toLowerCase();
             const search = document.getElementById('filter-search').value.toLowerCase();
 
             const filtered = bankSoalData.filter(row => {
@@ -1533,9 +1641,10 @@ Penting: Output HANYA boleh berisi kurung siku [...] JSON.
 
                 const matchMapel = mapel === '' || rowMapel === mapel;
                 const matchKelas = kelas === '' || rowKelas === kelas;
+                const matchMateri = materiFilter === '' || rowMateri === materiFilter;
                 const matchSearch = search === '' || rowMateri.includes(search) || rowSoal.includes(search);
 
-                return matchMapel && matchKelas && matchSearch;
+                return matchMapel && matchKelas && matchMateri && matchSearch;
             });
 
             renderTableBank(filtered);
